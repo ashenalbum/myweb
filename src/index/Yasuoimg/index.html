@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>反身而诚-js压缩图片</title>
+    <meta name="keywords" content="反身而诚,js小游戏">
+    <style>
+        :root{background:#f0f0f0;}
+        body{margin:0;overflow:hidden;text-decoration: none;}
+        a{text-decoration: none;}
+
+        .canvasbox{box-sizing:border-box;margin:10px auto 0;max-width:800px;max-height:500px;overflow:auto;}
+        .canvasbox canvas{display:block;margin:auto;background:url("bg.png");border:1px solid #000000;}
+        .btnbox{width:800px;margin:10px auto 0;text-align:center;}
+        .btnbox .filebox{display:inline-block;position:relative;width:80px;height:30px;margin-right:50px;}
+        .btnbox button{position:relative;font-size:16px;box-sizing:border-box;width:80px;height:30px;overflow:hidden;cursor:pointer;}
+        .btnbox .file{position:absolute;z-index:9;box-sizing:border-box;width:80px;height:30px;top:0;left:0;}
+        .btnbox .btn{border:1px solid;background:#ffffff;color:#333333;text-align:center;line-height:30px;font-size:20px;}
+        .btnbox .opa_0{opacity:0;}
+
+        .sx{width:800px;margin:0 auto;padding:20px 0;text-align:center;}
+        .sx .span{border-left:1px solid #cccccc;padding:0 10px;}
+        .sx .span:first-child{border:0;}
+
+        .setbox{width:800px;margin:10px auto 0;text-align:left;}
+        .setbox .span{display:inline-block;vertical-align:top;padding-right:40px;}
+        .setbox .span input{width:100px;outline:none;border-style:inset;}
+        .setbox .span input[type=checkbox]{width:auto;}
+
+        #showImg{display:none;position:absolute;width:200px;height:200px;z-index:10;background:url("bg.png");outline:1px solid #000000;}
+
+        #showBorder{position:absolute;display:none;}
+        #showBorder .border{position:absolute;left:-50px;top:-50px;width:0;height:0;}
+        #showBorder .border.top{top:-50px;width:100px;border-top:1px dashed #ff0000;}
+        #showBorder .border.bottom{top:50px;width:100px;border-bottom:1px dashed #ff0000;}
+        #showBorder .border.left{left:-50px;height:100px;border-left:1px dashed #ff0000;}
+        #showBorder .border.right{left:50px;height:100px;border-right:1px dashed #ff0000;}
+
+        .pos{position:absolute;right:10px;bottom:0;font-size:12px;}
+    </style>
+</head>
+<body>
+<div class="canvasbox">
+    <canvas id="canvas" width="550" height="400">您的浏览器不支持canvas</canvas>
+</div>
+<div class="btnbox">
+    <div class="filebox">
+        <span class="file btn">上 传</span>
+        <input id="file" class="file opa_0" type="file" />
+    </div>
+    <div class="filebox">
+        <a id="out" class="file btn" href="javascript:alert('请先上传图片');">下 载</a>
+    </div>
+</div>
+<div class="sx">
+    <span id="size" class="span">大小：</span>
+    <span id="width" class="span">宽：</span>
+    <span id="height" class="span">高：</span>
+    <span id="zhiliang" class="span">质量：</span>
+</div>
+<div class="setbox">
+    <span class="span">设置选项：</span>
+    <span class="span">
+        同步：<input id="setWHtb" type="checkbox" checked/><br/>
+        宽度：<input id="setWidth" type="number" /><br/>
+        高度：<input id="setHeight" type="number" />
+    </span>
+    <span class="span">
+        质量：<input id="setZhiliang" type="number"/><i style="font-size:12px;">范围：1-10</i>
+    </span>
+</div>
+<canvas id="showImg" width="200" height="200"></canvas>
+<div id="showBorder">
+    <div class="border top"></div>
+    <div class="border bottom"></div>
+    <div class="border left"></div>
+    <div class="border right"></div>
+</div>
+<p class="pos">前端压缩图片功能非常有限，好在这里有一个神奇的网站：<a target="_blank" href="https://compressjpeg.com/zh/">https://compressjpeg.com/zh/</a></p>
+<script>
+    if(window.parent.lowIE){
+        alert("您的浏览器不支持canvas,请升级浏览器，建议使用谷歌浏览器");
+        window.parent.document.querySelector(".mask>.addClose").click();
+    }else if(window.parent.lowIE===0){
+        alert("您的浏览器不能操作文件，请升级浏览器或使用其他浏览器");
+        window.parent.document.querySelector(".mask>.addClose").click();
+    }
+
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var img = null;
+    var name = "";
+    var type = "";
+    var zhiliang = 10;
+    var w = 0;
+    var h = 0;
+    var scale = 1;
+    var showImg = document.getElementById("showImg");
+    var showCtx = showImg.getContext("2d");
+    var supportDownload = "download" in document.createElement("a");
+
+    init();
+    function init(){
+
+        document.getElementById("file").onchange = function(){
+            var file = this.files[0];
+            if(!file){return false;}
+            name = file.name.match(/(^.+)\.(\w*)$/)[1];
+            type = file.name.match(/(^.+)\.(\w*)$/)[2];
+            var url = getObjectURL(file);
+            img = new Image();
+            img.onload = begin;
+            img.src = url;
+            function getObjectURL(file) {
+                var url = null ;
+                if (window.createObjectURL!=undefined) { // basic
+                    url = window.createObjectURL(file);
+                } else if (window.URL!=undefined) { // mozilla(firefox)
+                    url = window.URL.createObjectURL(file) ;
+                } else if (window.webkitURL!=undefined) { // webkit or chrome
+                    url = window.webkitURL.createObjectURL(file) ;
+                }
+                return url ;
+            }
+        };
+        inputEvent();
+        show();
+    }
+
+    function begin(){
+        zhiliang = 10;
+        w = img.width;
+        h = img.height;
+        setWH(img.width,img.height);
+        document.getElementById("setZhiliang").value = "10";
+    }
+    function out(){
+        ctx.clearRect(0,0,w,h);
+        if(zhiliang!=10){
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0,0,w,h);
+        }
+        ctx.drawImage(img,0,0,img.width,img.height,0,0,w,h);
+        var downloadBtn = document.getElementById("out");
+        var objUrl = canvas.toDataURL('image/'+(zhiliang!=10?"jpeg":type),zhiliang/10);
+        show();
+        var str = objUrl.substring(22);
+        if(str.indexOf('=')>0){str=str.substring(0,str.indexOf('='));}
+        var size=parseInt(str.length-(str.length/8)*2);
+        downloadBtn.href = objUrl;
+        downloadBtn.setAttribute("download",name+"."+(zhiliang!=10?"jpeg":type));
+        if(canvas.msToBlob){
+            console.log("download type : canvas.msToBlob");
+            var blobObj = canvas.msToBlob();
+            console.log(blobObj);
+            downloadBtn.onclick = function(){
+                navigator.msSaveBlob(blobObj, name+"."+(zhiliang!=10?"jpeg":type));
+            };
+        }
+        document.getElementById("size").innerHTML = "大小：" + (size<1024000?((parseInt(size/1024*10)/10)+"<i style='font-size:12px;'>kb</i>"):((parseInt(size/1024/1024*100)/100)+"<i style='style=font-size:12px;'>Mb</i>"));
+        document.getElementById("zhiliang").innerHTML = "质量："+zhiliang;
+
+        function show(){
+            var img = new Image();
+            img.onload = function(){ctx.drawImage(this,0,0,w,h,0,0,w,h)};
+            img.src = objUrl;
+        }
+    }
+
+    function setWH(w,h){
+        document.getElementById("setWidth").value = w;
+        document.getElementById("setHeight").value = h;
+        document.getElementById("width").innerHTML = "宽："+w+"<i style='font-size:12px;'>px</i>";
+        document.getElementById("height").innerHTML = "高："+h+"<i style='font-size:12px;'>px</i>";
+        canvas.setAttribute("width",w);
+        canvas.setAttribute("height",h);
+        canvas.style.width = w+"px";
+        canvas.style.height = h+"px";
+        out();
+    }
+
+    function inputEvent(){
+        var setWidth = document.getElementById("setWidth");
+        var setHeight = document.getElementById("setHeight");
+        var setWHtb = document.getElementById("setWHtb");
+        var setZhiliang = document.getElementById("setZhiliang");
+        setWidth.addEventListener("input",function(){
+            if(!/^[1-9]\d*$/.test(this.value)){this.style.borderColor = "#ff0000";return false;}
+            this.style.borderColor = "#eeeeee";
+            if(setWHtb.checked){
+                setHeight.value = parseInt(Number(this.value)*(img.height/img.width));
+            }
+            w = Number(this.value);
+            h = Number(setHeight.value);
+            setWH(this.value,setHeight.value);
+        });
+        setHeight.addEventListener("input",function(){
+            if(!/^[1-9]\d*$/.test(this.value)){this.style.borderColor = "#ff0000";return false;}
+            this.style.borderColor = "#eeeeee";
+            if(setWHtb.checked){setWidth.value = parseInt(Number(this.value)*(img.width/img.height))}
+            w = Number(setWidth.value);
+            h = Number(this.value);
+            setWH(setWidth.value,this.value);
+        });
+        setZhiliang.addEventListener("input",function(){
+            if(!setZhiliang.xunwen){
+                if(confirm("改变质量将使图片格式转为jpeg,确定要进行该操作吗")){setZhiliang.xunwen = true;}else{return false;}
+            }
+            if(!/^([1-9]|10)$/.test(this.value)){this.style.borderColor = "#ff0000";return false;}
+            this.style.borderColor = "#eeeeee";
+            zhiliang = this.value;
+            out();
+        });
+    }
+
+    function show(){
+        var border = document.getElementById("showBorder");
+        canvas.addEventListener("mousemove",function(event){
+            if(!img){return false;}
+            var x = event.pageX;
+            var y = event.pageY;
+            var localX = x-this.offsetLeft+this.parentNode.scrollLeft;
+            var localY = y-this.offsetTop+this.parentNode.scrollTop;
+            showCtx.clearRect(0,0,200,200);
+            showCtx.drawImage(canvas,localX-50,localY-50,100,100,0,0,200,200);
+            showImg.style.left = x+50+(x>window.innerWidth-260?-240:0)+"px";
+            showImg.style.top = y+50+"px";
+            border.style.left = x+"px";
+            border.style.top = y+"px";
+        });
+        canvas.addEventListener("mouseout",function(){
+            if(!img){return false;}
+            showImg.style.display = "none";
+            border.style.display = "none";
+        });
+        canvas.addEventListener("mouseover",function(){
+            if(!img){return false;}
+            showImg.style.display = "block";
+            border.style.display = "block";
+        });
+    }
+
+</script>
+</body>
+</html>

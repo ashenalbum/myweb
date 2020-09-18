@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>反身而诚-js打字游戏</title>
+    <meta name="keywords" content="反身而诚,js小游戏">
+    <style>
+        body{margin:0;text-align:center;}
+        canvas{display:block;margin:0 auto 0;background-color:#000;background-repeat:repeat-y;background-position:left center;background-size:100% auto;}
+        .txt{line-height:2;font-size:14px;color:#666666;margin:0;}
+        .txt span{color:#ff0000;}
+        #stop,#help{margin-top:4px;font-size:18px;padding:2px 20px;cursor:pointer;}
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="900" height="600" style="outline:1px solid;">您的浏览器不支持canvas</canvas>
+<input type="button" id="stop" value="暂停" />
+<input type="button" id="help" value="帮助 (3)" />
+<p class="txt">未命中词语超过<span>10</span>条则挑战失败！命中超过<span>80</span>条挑战成功！<br/>按<span>“Enter”</span>键或暂停按钮暂停,按帮助按钮或 <span>"ctrl+H"/"shift+H"</span>请求帮助,有三次机会</p>
+<script>
+    if(window.parent.lowIE){
+        alert("您的浏览器不支持canvas,请升级浏览器，建议使用谷歌浏览器");
+        window.parent.document.querySelector(".mask>.addClose").click();
+    }
+
+    var canvas = document.getElementById("canvas");
+    var btn = document.getElementById("stop");
+    var hpBtn = document.getElementById("help");
+    var ctx = canvas.getContext("2d");
+    var stageW = canvas.getAttribute("width");
+    var stageH = canvas.getAttribute("height");
+    var bgPosition = 0;
+    var textArr = ["add", "ajax", "alert", "array", "background", "body", "border", "bottom", "box", "break", "canvas", "center", "child", "class", "click", "close", "color", "console", "content", "continue", "cookie", "css", "data", "date", "detail", "div", "document", "edit", "element", "error", "event", "false", "focus", "font", "for", "for", "function", "get", "head", "height", "html", "id", "if", "image", "index", "index", "input", "int", "left", "length", "list", "margin", "math", "max", "min", "new", "null", "number", "object", "open", "padding", "parent", "pop", "position", "push", "random", "rect", "remove", "replace", "return", "root", "set", "shift", "size", "string", "target", "text", "this", "top", "true", "width", "window", "无敌是多么寂寞"];
+    var wordList = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+    var wordArr = {};
+    var btArr = {};
+    var boomArr = {};
+    var inputArr = [];
+    var imgArr = {};
+    var lost = 0;
+    var kill = 0;
+    var add = 0;
+    var game = true;
+    var timeout = false;
+
+    //词语
+    var Word = function (){
+        this.id = 0;
+        this.x = 0;
+        this.y = 0;
+        this.size = parseInt(Math.random()*20+20);
+        this.text = textArr[parseInt(Math.random()*textArr.length)];
+        this.color = getColor(180);
+        this.speedX = Number((Math.random()*10-5).toFixed(2));
+        this.speedY = Number((Math.random() + 1).toFixed(2));
+        this.width = 0;
+        this.height = 0;
+        this.kill = false;
+        this.full = 0;
+        this.imgW = 0;
+        this.imgH = 0;
+
+        if(Math.random()<0.02){this.size = 150;this.speed *= 2;}
+        function getColor(n){
+            n = parseInt(n);
+            if(typeof n!="number"||n>255||n<10){n=255}
+            var r = parseInt(Math.random()*n).toString(16);
+            var g = parseInt(Math.random()*n).toString(16);
+            var b = parseInt(Math.random()*n).toString(16);
+            return "#"+(r.length<2?"0"+r:r)+(g.length<2?"0"+g:g)+(b.length<2?"0"+b:b);
+        }
+    };
+    Word.prototype.move = function(){
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if(this.x<0||this.x>stageW-this.width){this.speedX *= -1;}
+        if(this.y>stageH){
+            lost++;
+            Word.remove(this.id);
+            if(btArr[this.id]){
+                Bt.remove(this.id);
+            }
+        }
+    };
+    Word.create = function (){
+        var w = new Word();
+        w.id = (new Date()).getTime();
+        ctx.font= "bold "+w.size+"px SimHei";
+        w.width = ctx.measureText(w.text).width;
+        w.height = w.size;
+        w.x = Math.random()*(stageW- w.width);
+        w.imgH = w.height*2;
+        w.imgW = w.imgH * 1.92;
+        wordArr[w.id] = w;
+    };
+    Word.remove = function(id){delete wordArr[id]};
+
+    //子弹
+    var Bt = function(){
+        this.type = 1;
+        this.id = 0;
+        this.color = null;
+        this.speed = 20;
+        this.x = stageW/2-12;
+        this.y = stageH-40;
+        this.old = [stageW/2,stageH-20];
+        this.rotate = 0;
+    };
+    Bt.prototype.move = function(){
+        this.old = [this.x,this.y];
+        var mb = wordArr[this.id];
+        if(!mb){Bt.remove(this.id);return false}
+        var center = {x:mb.x+(mb.width/2),y:mb.y+(mb.height/2)};
+        var long = Math.pow((Math.pow(center.x-this.x,2)+Math.pow(center.y-this.y,2)),0.5);
+        this.x += this.speed * (center.x - this.x)/long;
+        this.y += this.speed * (center.y - this.y)/long;
+        if(this.x>mb.x&&this.y>mb.y&&this.x<mb.x+mb.width&&this.y<mb.y+mb.height){
+            kill++;
+            Boom.create(this.id);
+            Bt.remove(this.id);
+            Word.remove(this.id);
+        }
+        this.rotate = Math.atan2(this.y-this.old[1],this.x-this.old[0]) + (Math.PI/2);
+    };
+    Bt.create = function(id){
+        var bt = new Bt();
+        var mb = wordArr[id];
+        mb.kill = true;
+        bt.color = mb.color;
+        bt.id = mb.id;
+        btArr[mb.id] = bt;
+    };
+    Bt.remove = function(id){
+        delete btArr[id];
+    };
+
+    //爆炸
+    var Boom = function(){
+        this.id = 0;
+        this.now = 0;
+        this.length = 28;
+        this.x = 0;
+        this.y = 0;
+        this.dx = 0;
+        this.dy = 0;
+        this.dw = imgArr.boom.width/8;
+        this.dh = imgArr.boom.height/4;
+        this.width = 0;
+        this.height = 0;
+        this.rotate = parseInt(Math.random()*(Math.PI*2)*100)/100;
+    };
+    Boom.prototype.move = function(){
+        this.now++;
+        if(this.now>this.length){this.remove();}
+        this.dx = (this.now % 8) * this.dw;
+        this.dy = parseInt(this.now / 8) * this.dh;
+    };
+    Boom.prototype.remove = function(id){
+        delete boomArr[id];
+    };
+    Boom.create = function(id){
+        var w = wordArr[id];
+        var b = new Boom();
+        b.width = b.height = w.height*3;
+        b.x = w.x + (w.width/2) - (b.width/2);
+        b.y = w.y + (w.height/2) - (b.height/2);
+        boomArr[id] = b;
+    };
+
+    //循环
+    function draw(){
+        add++;
+        if(add>30&&game){
+            Word.create();
+            add=0;
+        }
+        ctx.clearRect(0,0,stageW,stageH);
+
+        for(var i in wordArr) {
+            var t = wordArr[i];
+            t.move();
+            ctx.fillStyle = t.color||"#ff0000";
+            ctx.strokeStyle = t.color||"#ff0000";
+            ctx.shadowBlur=20;
+            ctx.shadowColor = t.color;
+            ctx.font= "bold "+t.size+"px SimHei";
+            ctx.beginPath();
+            ctx.drawImage(imgArr["ufo"], 0, 0, 500, 260, t.width/2+ t.x-(t.imgW/2), t.y-(t.imgH/5)- t.height, t.imgW, t.imgH);
+            if(t.kill){
+                ctx.fillText(t.text, t.x, t.y);
+            }else{
+                ctx.strokeText(t.text, t.x, t.y);
+                ctx.fillText(t.text.substr(0,t.full), t.x, t.y);
+            }
+            ctx.stroke();
+            ctx.closePath();
+        }
+        for(var j in btArr){
+            var bt = btArr[j];
+            bt.move();
+            ctx.shadowBlur=30;
+            ctx.shadowColor = bt.color;
+            ctx.save();//保存状态
+            ctx.translate(bt.x+13,bt.y);//设置画布上的(0,0)位置，也就是旋转的中心点
+            ctx.rotate(bt.rotate);//bt.rotate());
+            ctx.drawImage(imgArr['bt'],0,0,imgArr['bt'].width,imgArr['bt'].height,0,0,25,70);//把图片绘制在旋转的中心点，
+            ctx.restore();//恢复状态
+            ctx.stroke();
+            ctx.closePath();
+        }
+        for(var k in boomArr){
+            var boom = boomArr[k];
+            var boomImg = imgArr["boom"];
+            ctx.save();
+            ctx.translate(boom.x+(boom.width/2),boom.y+(boom.height/2));
+            ctx.rotate(boom.rotate);
+            ctx.drawImage(boomImg,boom.dx,boom.dy,boom.dw,boom.dh,-boom.width/2,-boom.height/2,boom.width,boom.height);
+            ctx.restore();
+            ctx.stroke();
+            ctx.closePath();
+            boom.move();
+        }
+
+        ctx.beginPath();
+        ctx.font= "20px SimHei";
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#ffffff";
+        ctx.shadowBlur=0;
+        ctx.fillText("未命中："+lost,20,20);
+        ctx.fillText("命  中："+kill,20,60);
+
+        var inputText = inputArr.join("");
+        var inputTextWid = ctx.measureText(inputText).width;
+        ctx.fillText(inputText,stageW/2-(inputTextWid/2),stageH-20);
+        if(inputArr.length!=0){
+            ctx.strokeRect(stageW/2-(inputTextWid/2)-10,stageH-40,inputTextWid+20,30);
+        }
+        ctx.stroke();
+        ctx.closePath();
+
+        if((kill>=80||lost==10) && game){
+            setTimeout(function(){
+                alert(kill>=80?"挑戰成功！":"挑戰失敗！");
+            },100);
+            game = false;
+            btn.removeEventListener("click",stopFun);
+        }else if(game){
+            canvas.style.backgroundPositionY = bgPosition+"px";
+            bgPosition+=2;
+        }
+    }
+
+    //键盘
+    window.onkeydown = function(event){
+        var code = event.keyCode||event.which;
+        switch (code){
+            case 8:if(inputArr.length){inputArr.pop()}return false;
+            case 13:document.getElementById("stop").click();return false;
+            case 72:if(event.ctrlKey||event.shiftKey){hpBtn.click();event.preventDefault();return false;}break;
+        }
+        if(code>90 || code<65){return;}
+        var keyT = wordList[code-65];
+        inputArr.push(keyT);
+
+        var clear = [];
+        for(var i in wordArr){
+            if(wordArr[i].kill){continue;}
+            var full = null;
+            for(var w in inputArr){
+                if(wordArr[i].text[w]==inputArr[w]){
+                    full=Number(w)+1;
+                }else{
+                    full=null;
+                    break;
+                }
+            }
+            if(wordArr[i].text.length==inputArr.length && full){
+                Bt.create(i);
+                clear = [];
+                for(var c in wordArr){wordArr[c].full = 0;}
+                break;
+            }else if(full!=null){
+                clear = inputArr;
+            }
+            wordArr[i].full = full?full:0;
+        }
+        inputArr = clear;
+    };
+
+    //暂停
+    btn.addEventListener("click",stopFun);
+    function stopFun(){
+        if(timeout){
+            window.clearInterval(timeout);
+            timeout = 0;
+            this.value = "开始";
+        }else{
+            timeout = window.setInterval(draw,50);
+            this.value = "暂停";
+        }
+    }
+
+    //帮助
+    var helpNum = 3;
+    hpBtn.addEventListener("click",help);
+    function help(){
+        if(helpNum<=0){return false;}
+        for(var i in wordArr){
+            //if(wordArr[i].kill){continue}
+            Boom.create(i);
+            Word.remove(i);
+            add = 0;
+			kill++;
+        }
+        if(i){helpNum--;}
+        this.value = "帮助 ("+helpNum+")";
+    }
+
+    //加载
+    function init(){
+        ctx.font= "bold 60px SimHei";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("Loading...",stageW/2-(ctx.measureText("Loading...").width/2),stageH/2-30);
+        var loadarr = [["ufo","img/u.png"],["bt","img/bt.png"],["boom","img/boom.png"],["bg","img/bg.jpg"]];
+        var loadId = 0;
+        load();
+        function load(){
+            var loadTxt = "Loading...("+loadId+"/"+loadarr.length+")";
+            ctx.clearRect(0,0,stageW,stageH);
+            ctx.fillText(loadTxt,stageW/2-(ctx.measureText(loadTxt).width/2),stageH/2-30);
+            var nowload = loadarr[loadId];
+            loadId++;
+            if(!nowload){
+                ctx.clearRect(0,0,stageW,stageH);
+                begin();
+                return false;
+            }
+            var img = new Image();
+            img.onload = function(){
+                imgArr[nowload[0]] = this;
+                load();
+            };
+            img.src = nowload[1];
+        }
+        function begin(){
+            canvas.click();
+            canvas.style.backgroundImage = "url('"+imgArr.bg.src+"')";
+            var djs = [3,2,1,"GO!"];
+            var djsId = 0;
+            var djsFn = function(){
+                if(djsId>=4){
+                    timeout = setInterval(draw,50);
+                }else{
+                    ctx.clearRect(0,0,stageW,stageH);
+                    ctx.fillText(djs[djsId],stageW/2-(ctx.measureText(djs[djsId]).width/2),stageH/2-30);
+                    djsId++;
+                    setTimeout(djsFn,600);
+                }
+            };
+            setTimeout(djsFn,100);
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>

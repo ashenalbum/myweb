@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>反身而诚 - 老虎机</title>
+    <meta name="keywords" content="反身而诚,js老虎机游戏">
+    <style>
+        *{margin:0;}
+        canvas{display:block;box-shadow:0 0 12px #333;}
+		#txt{display:none;position:absolute;font-size:18px;left:900px;top:80px;}
+		#load{position:absolute;width:200px;height:100px;line-height:100px;font-size:22px;text-align:center;left:0;right:0;top:0;bottom:0;margin:auto;}
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="1100" height="700"></canvas>
+<div id="load">加载中 0%</div>
+<div id="txt">注:每次花费10金币</div>
+<script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+	var imgloadarr = ["img/opt.png","img/bg.png","img/open.png","img/gold.png"];
+	var imgarr = [];
+	var goldarr = {};
+	var goldarrkey = 0;
+	var opt1 = new Opt();//转盘1
+	var opt2 = new Opt();//转盘2
+		opt2.beginNum = 18;
+	var opt3 = new Opt();//转盘3
+		opt3.beginNum = 28;
+	var gold = 100;//金币总数
+	var spend = 10;//每次花费
+	var fuzhai = false;
+	var activeOpen = false;
+
+	var oX = 10;//老虎机距离左边
+	var oY = 20;//老虎机距离上边
+	
+	//开始加载
+	load(0);
+	
+	//转盘
+	function Opt(){
+		this.id = 0;
+		this.stop = true;
+		this.imgy = 0;
+		this.img = {w:150,h:1350};
+		this.csz = {w:94,h:846};
+		this.cha = this.img.w/this.csz.w;
+		this.beginNum = 8;
+		this.moveNum = parseInt(Math.random()*9);
+		this.moveLen = this.img.w / 5;
+		this.moveFrame = 0;
+		
+		this.move = function(){
+			if(this.stop){return false;}
+			this.moveFrame++;
+			if(this.moveFrame <= (this.beginNum+this.moveNum)*5 ){
+				this.imgy += this.moveLen;
+			}else{
+				this.moveNum = parseInt(Math.random()*9);
+				this.id = (this.id + this.beginNum + this.moveNum)%9;
+				this.imgy = this.id*this.img.w;
+				this.stop = true;
+				this.moveFrame = 0;
+				addgold();
+			}
+			if(this.imgy>this.img.h){this.imgy=this.imgy%this.img.h}
+		}
+	}
+	//金币
+	function Golds(){
+		this.key = 0;
+		this.money = spend;
+		this.x = parseInt(Math.random()*200) + 200;
+		this.y = parseInt(Math.random()*100) + 300;
+		this.end = {x:1000,y:40};
+		this.size = 60;
+		this.drawSize = 90;
+		this.speed = 15;
+		this.ssX = parseInt(Math.random()*50)-30;
+		this.ssY = parseInt(Math.random()*40)-20;
+		this.move = function(){
+			var row = Math.atan((this.end.y - this.y)/(this.end.x-this.x));
+			var mx = this.speed*Math.cos(row) + this.ssX;
+			var my = this.speed*Math.sin(row) + this.ssY;
+			this.ssX==0?null:this.ssX-=(this.ssX/Math.abs(this.ssX));
+			this.ssY==0?null:this.ssY-=(this.ssY/Math.abs(this.ssY));
+			if(Math.abs(this.end.x-this.x)<Math.abs(mx) && Math.abs(this.end.y-this.y)<Math.abs(my)){
+				delete goldarr[this.key];
+				gold += this.money;
+				return false;
+			}
+			this.drawSize *= 0.98;
+			this.x += mx;
+			this.y += my;
+			
+		}
+	}
+	//金币数
+	function addgold(){
+		if(!(opt1.stop&&opt2.stop&&opt3.stop)){return false;}
+		var o1 = opt1.id;
+		var o2 = opt2.id;
+		var o3 = opt3.id;
+		var createGold = {};
+		
+		if(o1==o2&&o2==o3){
+			if(o1==0){createGold = {num:200,money:5*spend}}
+			else if(o1==5){createGold = {num:100,money:5*spend}}
+			else{createGold = {num:50,money:3*spend}}
+		}else if(o1==o2||o2==o3||o3==o1){
+			if(((o1==o2||o2==o3)&&(o2==0))||((o1==o3)&&(o3==0))){createGold = {num:20,money:spend/2}}
+			else if(((o1==o2||o2==o3)&&(o2==5))||((o1==o3)&&(o3==5))){createGold = {num:20,money:spend/2}}
+			else{createGold = {num:6,money:spend/2}}
+		}
+		//createGold = {num:200,money:5*spend}
+		for(var i=0;i<createGold.num;i++){
+			var g = new Golds();
+			g.money = createGold.money;
+			g.key = ++goldarrkey;
+			goldarr[g.key] = g;
+		}
+	}
+	//帧
+	function frame(){
+		opt1.move();
+		opt2.move();
+		opt3.move();
+		for(var i in goldarr){
+			goldarr[i].move();
+		}
+		draw();
+		requestAnimationFrame(frame);
+	}
+	//画布
+	function draw(){
+		//清除画布
+		ctx.clearRect(0,0,1100,700);
+		//老虎机
+		ctx.drawImage(imgarr[0],0,opt1.imgy-21*opt1.cha+150,opt1.img.w,opt1.img.w+42*opt1.cha, oX+178,oY+303,opt1.csz.w,opt1.csz.w+42);
+		ctx.drawImage(imgarr[0],0,opt2.imgy-21*opt1.cha+150,opt2.img.w,opt2.img.w+42*opt1.cha, oX+305,oY+303,opt2.csz.w,opt2.csz.w+42);
+		ctx.drawImage(imgarr[0],0,opt3.imgy-21*opt1.cha+150,opt3.img.w,opt3.img.w+42*opt1.cha, oX+431,oY+303,opt3.csz.w,opt3.csz.w+42);
+		ctx.drawImage(imgarr[1],0,0,703,650,oX,oY,703,650);
+		//开/关
+		if(activeOpen){
+			ctx.save();
+			ctx.translate(0,(oY+200+180)*2);
+			ctx.scale(1,-1);
+			ctx.drawImage(imgarr[2],0,0,65,360,oX+638,oY+200,65,360);
+			ctx.restore();
+		}else{
+			ctx.drawImage(imgarr[2],0,0,65,360,oX+638,oY+200,65,360);
+		}
+		//金币数字框
+		ctx.fillStyle = "#000";
+		ctx.font="20px Arial";
+		ctx.textAlign="left";
+		ctx.fillText("目前金币：", 800, 45,100);
+		ctx.rect(900,18,160,40);
+		ctx.fillStyle = "#FFA500";
+		ctx.font="28px Arial";
+		ctx.textAlign="right";
+		ctx.fillText(gold, 1050, 48,160);
+		//金币
+		for(var i in goldarr){
+			var g = goldarr[i];
+			ctx.drawImage(imgarr[3],0,0,g.size,g.size,g.x,g.y,g.drawSize,g.drawSize);
+		}
+		ctx.stroke();
+	}
+	//加载图片
+	function load(loadid){
+		var img = new Image();
+		img.src = imgloadarr[loadid];
+		img.onload = function(){
+			imgarr.push(img);
+			if(++loadid==imgloadarr.length){
+				document.getElementById("load").style.display = "none";
+				document.getElementById("txt").style.display = "block";
+				begin();
+			}else{
+				document.getElementById("load").innerHTML = "加载中 "+(loadid/4*100)+"%";
+				load(loadid);
+			}
+		}
+	}
+	function begin(){
+		canvas.addEventListener("mousemove",function(event){
+			var x = event.clientX;
+			var y = event.clientY;
+			if(x < oX+640 || x > oX+640+65 || y< oY+200 || y > oY+200+360){
+				canvas.style.cursor = "auto";
+			}else{
+				canvas.style.cursor = "pointer";
+			}
+		});
+		canvas.addEventListener("mousedown",function(event){
+			var x = event.clientX;
+			var y = event.clientY;
+			if(x < oX+640 || x > oX+640+65 || y< oY+200 || y > oY+200+360){return false;}
+			if(!(opt1.stop&&opt2.stop&&opt3.stop)){return false;}
+			activeOpen = true;
+		});
+		canvas.addEventListener("mouseup",function(){
+			activeOpen = false;
+		});
+		canvas.addEventListener("click",function(event){
+			var x = event.clientX;
+			var y = event.clientY;
+			if(x < oX+640 || x > oX+640+65 || y< oY+200 || y > oY+200+360){return false;}
+			if(!(opt1.stop&&opt2.stop&&opt3.stop)){alert('请稍后');return false;}
+			if(gold<spend && !fuzhai){
+				if(!confirm('您将要负债，是否继续')){fuzhai = true;return false;}
+			}
+			gold -= spend;
+			opt1.stop = false;
+			opt2.stop = false;
+			opt3.stop = false;
+		});
+		
+		frame();
+	}
+</script>
+</body>
+</html>

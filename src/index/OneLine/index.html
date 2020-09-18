@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>反身而诚-js一笔连珠游戏</title>
+    <meta name="keywords" content="反身而诚,js小游戏">
+    <style>
+        body{text-align:center;margin:0;}
+        b{color:#ff0000;}
+        .txt{position:absolute;left:0;top:10px;font-size:16px;text-align:left;}
+        canvas{background:#fddc9e;display:block;margin:10px auto 0;}
+        input,select{box-sizing:border-box;width:100px;height:30px;line-height:1;margin:10px 30px 0;font-size:18px;}
+        #dh{display:none;}
+    </style>
+</head>
+<body>
+<div class="txt">拖动<b>金色的泡泡</b>把<b>白色的泡泡</b>点亮<br/>已经点亮的不可以重复<br/>直到你把<b>所有的泡泡都点亮</b></div>
+<canvas id="canvas" width="500" height="580"></canvas>
+<input type="button" value="重来" onclick="again()"/>
+<select id="select"><option>选择关卡</option></select>
+<div id="dh"></div>
+<script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext('2d');
+    var rectW = 80;
+    var offset = 10;
+    var heng = 6;
+    var zong = 7;
+    var basearr = [];
+    var gq = [
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,1,1,1,2,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,1,1,1,2,0],
+        [0,0,1,1,0,0],
+        [0,0,1,1,0,0],
+        [0,0,1,1,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,2,1,1,1,0],
+        [0,1,1,1,2,0],
+        [0,1,1,1,1,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,2,0,1,1,0],
+        [0,1,1,1,1,0],
+        [0,0,0,1,1,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,1,1,1,1],
+        [0,0,1,0,1,1],
+        [0,2,1,0,1,0],
+        [0,0,0,0,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,2,0,1,1,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,1,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,0,0],
+        [0,2,1,1,1,0],
+        [0,0,1,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,1,0,0],
+        [0,1,1,1,2,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,2,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,0,0,1,1,1],
+        [0,0,0,0,1,1]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,1,1,0,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,2,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,2,1,0,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,0,2,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,1,1,1,2,0],
+        [0,1,0,1,0,0],
+        [0,1,1,1,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,1,1,1,0,0],
+        [0,1,0,1,1,0],
+        [0,1,1,1,2,0],
+        [0,1,1,0,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,1,1,1,1,0],
+        [0,1,0,2,1,0],
+        [0,1,1,1,0,0],
+        [0,1,1,1,0,0],
+        [0,0,1,1,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,2,0],
+        [0,1,1,1,1,0],
+        [0,1,0,1,1,0],
+        [0,1,1,1,1,0],
+        [0,0,1,1,1,1],
+        [0,0,0,0,1,1]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,1,0,0,0,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,0,1,1,0],
+        [0,1,1,1,2,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,1,1,1,1,0],
+        [0,1,1,1,1,0],
+        [0,1,0,2,1,0],
+        [0,1,1,1,1,0],
+        [0,0,0,0,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,1,1,0],
+        [0,1,2,1,1,0],
+        [0,1,0,1,2,0],
+        [0,1,1,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,1,0,0,0,0],
+        [0,1,1,2,0,0],
+        [0,1,1,0,1,0],
+        [0,1,1,2,1,0],
+        [0,1,1,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,1,1,0],
+        [0,1,1,1,2,0],
+        [0,1,0,1,1,0],
+        [0,1,2,1,0,0],
+        [0,1,1,1,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,1,1,1,1,0],
+        [0,1,1,0,1,0],
+        [0,2,1,1,1,0],
+        [0,1,2,1,0,0],
+        [0,1,1,1,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,1,1,0],
+        [0,1,1,1,1,1],
+        [0,1,1,1,0,1],
+        [0,0,2,1,0,1],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,1,1,1,0],
+        [0,0,1,1,1,0],
+        [0,1,1,1,2,1],
+        [0,1,2,0,1,1],
+        [0,1,1,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,1,1,1,0,0],
+        [0,1,0,2,1,1],
+        [0,1,0,1,0,1],
+        [0,1,2,1,1,1],
+        [0,0,0,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,0,1,1],
+        [0,1,1,1,2,1],
+        [0,1,0,1,1,1],
+        [0,1,2,0,0,1],
+        [0,0,1,1,1,1],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,1,1,1,2],
+        [0,1,1,1,0,0],
+        [0,1,1,1,0,0],
+        [0,1,1,1,0,2],
+        [0,1,0,1,1,1],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,1,1,1,1,2],
+        [0,1,1,1,0,1],
+        [0,1,0,1,1,1],
+        [0,1,2,1,0,0],
+        [0,1,1,1,1,0],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,1,1,1,1,1],
+        [0,1,1,0,1,1],
+        [0,1,1,2,1,1],
+        [0,1,0,1,0,1],
+        [0,1,1,1,1,1],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,1,1,1,0],
+        [0,1,1,0,1,1],
+        [0,1,0,1,2,1],
+        [0,1,1,1,0,1],
+        [0,0,0,1,1,1],
+        [0,0,0,0,0,0]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [1,2,0,0,0,0],
+        [1,1,1,1,0,0],
+        [2,1,0,1,0,0],
+        [1,1,0,1,1,1],
+        [1,1,0,1,1,0],
+        [0,1,1,1,1,1]
+    ],
+    [
+        [0,0,0,0,0,0],
+        [0,0,0,1,1,0],
+        [0,0,1,1,1,1],
+        [0,1,1,0,1,1],
+        [0,1,0,1,1,0],
+        [0,1,1,1,2,0],
+        [0,1,1,1,1,0]
+    ],
+    [
+        [0,0,1,1,1,0],
+        [0,1,1,1,1,2],
+        [0,1,1,0,0,1],
+        [0,0,1,1,0,1],
+        [0,1,1,1,1,1],
+        [0,1,2,1,1,0],
+        [0,0,0,1,0,0]
+    ],
+    [
+        [2,1,1,1,1,0],
+        [1,1,1,0,1,1],
+        [1,1,0,0,2,1],
+        [0,1,1,1,1,0],
+        [0,1,1,0,1,1],
+        [1,1,0,1,1,1],
+        [0,0,0,2,1,1]
+    ],
+    [
+        [0,1,1,1,2,1],
+        [0,1,2,1,1,1],
+        [1,0,0,1,1,1],
+        [1,0,1,1,1,0],
+        [1,0,1,0,1,1],
+        [1,1,1,1,2,1],
+        [0,0,0,1,1,1]
+    ],
+    [
+        [1,1,1,0,0,0],
+        [1,1,1,1,1,1],
+        [0,0,1,1,2,1],
+        [1,1,1,1,0,1],
+        [1,1,0,1,1,1],
+        [1,2,1,0,0,1],
+        [1,1,1,2,1,1]
+    ]];
+    var nowGq = 0;
+    var imgsrcarr = ["img/1.png","img/2.png","img/3.png","img/4.png"];
+
+    loadimg(0);
+    function init(){
+        createBase(gq[0]);
+        ctx.beginPath();
+        ctx.fillStyle = "#edbc6c";
+        ctx.fillRect(0,0,500,580);
+        ctx.closePath();
+        var select = document.getElementById("select");
+        for(var s=0;s<gq.length;s++){
+            var option = document.createElement("option");
+            option.innerHTML = s+1;
+            option.value = s;
+            select.appendChild(option);
+        }
+        select.onchange = function(){
+            if(this.value){nowGq=Number(this.value);again();}
+        };
+        for(var i=0;i<zong;i++){
+            for(var j=0;j<heng;j++){
+                drawRect(j,i,basearr[i][j]);
+            }
+        }
+        canvas.addEventListener("mousedown",mouseDown);
+    }
+    function loadimg(n){
+        var img = document.createElement("img");
+        img.src = imgsrcarr[n];
+        img.onload = function(){
+            document.getElementById("dh").appendChild(img);
+            if(n==imgsrcarr.length-1){init();return false;}
+            loadimg(++n);
+        }
+    }
+    function createBase(arr){
+        for(var a=0;a<zong;a++){
+            basearr.push(new Array(heng).fill(0));
+        }
+        if(!arr){return basearr;}
+        for(var i=0;i<arr.length;i++){basearr[i] = arr[i].slice()}
+        return basearr;
+    }
+    function drawRect(x,y,type){
+        var px = offset + x * rectW;
+        var py = offset + y * rectW;
+        ctx.beginPath();
+        ctx.fillRect(px,py,rectW,rectW);
+        ctx.clearRect(px+2,py+2,rectW-4,rectW-4);
+        if(!type){return false;}
+        ctx.drawImage(document.getElementById("dh").children[type-1],0,0,48,48,px+2,py+2,rectW-4,rectW-4);
+        ctx.closePath();
+    }
+    function mouseDown(event){
+        var x = event.clientX - canvas.offsetLeft;
+        var y = event.clientY - canvas.offsetTop;
+        x = parseInt((x-offset)/rectW);
+        y = parseInt((y-offset)/rectW);
+        if((!basearr[y])||basearr[y][x]!==2){return false;}
+        canvas.addEventListener("mousemove",mousemove);
+        canvas.addEventListener("mouseup",mouseup);
+        basearr[y][x] = 4;
+        if(basearr.now){
+            basearr[basearr.now.y][basearr.now.x] = 3;
+            drawRect(basearr.now.x,basearr.now.y,3);
+        }
+        basearr.now = {x:x,y:y};
+        drawRect(x,y,4);
+    }
+    function mousemove(event){
+        var x = event.clientX - canvas.offsetLeft;
+        var y = event.clientY - canvas.offsetTop;
+        x = parseInt((x-offset)/rectW);
+        y = parseInt((y-offset)/rectW);
+        if(basearr[y]&&basearr[y][x]==1&&(Math.abs(x-basearr.now.x)+Math.abs(y-basearr.now.y)==1)){
+            basearr[basearr.now.y][basearr.now.x] = 3;
+            drawRect(basearr.now.x,basearr.now.y,3);
+            basearr[y][x] = 4;
+            basearr.now = {x:x,y:y};
+            drawRect(x,y,4);
+        }
+    }
+    function mouseup(){
+        if(basearr.now){
+            basearr[basearr.now.y][basearr.now.x] = 3;
+            drawRect(basearr.now.x,basearr.now.y,3);
+        }
+        canvas.removeEventListener("mousemove",mousemove);
+        var clear = false;
+        for(var i=0;i<zong;i++){
+            for(var j=0;j<heng;j++){
+                if(basearr[i][j]==2){
+                    return false;
+                }
+                if(basearr[i][j]==1){
+                    clear = true;
+                }
+            }
+        }
+        if(clear){
+            alert("失败了");
+            again();
+        }else{
+            if(nowGq==gq.length-1){alert("通关了");return false;}
+            //alert("成功了");
+            nowGq++;
+            again();
+        }
+    }
+    function again(){
+        basearr.now = false;
+        document.getElementById("select").options[nowGq+1].selected = true;
+        createBase(gq[nowGq]);
+        for(var i=0;i<zong;i++){
+            for(var j=0;j<heng;j++){
+                drawRect(j,i,basearr[i][j]);
+            }
+        }
+    }
+</script>
+</body>
+</html>

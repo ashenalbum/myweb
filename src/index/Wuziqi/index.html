@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>反身而诚</title>
+    <meta name="keywords" content="">
+    <style>
+        *{margin:0;}
+		body{font-size:18px;}
+		canvas{float:left;margin:10px;border:4px double #333;cursor:pointer;}
+		.fr{margin:10px 40px 0 0;float:right;}
+		.tr{text-align:right;}
+		.tc{text-align:center;}
+		table td{padding:10px 0;}
+		select{width:100px;height:28px;font-size:18px;}
+		input[type=button]{font-size:18px;height:32px;width:120px;}
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="640" height="640"></canvas>
+<div class="fr">
+	<table>
+		<tr>
+			<td class="tr">先手：</td>
+			<td>
+				<select id="begin">
+					<option value="2">玩家</option>
+					<option value="1">电脑</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="tr">玩家颜色：</td>
+			<td>
+				<select id="selectcolor">
+					<option value="1">黑</option>
+					<option value="2">百</option>
+				</select>
+			</td>
+		</tr>
+		<tr><td colspan="2" class="tc">
+			<input id="start" type="button" value="开始"/>
+		</td></tr>
+	</table>
+</div>
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var tb = 19;
+var mainArr = [];
+var pGrade = [];
+var cGrade = [];
+var start = false;
+var begin = 2;
+var color = {1:"#fff",2:"#000"};
+var moveP = [-1,-1];
+var dw = 640/tb;
+var os = dw/2;
+
+init();
+draw();
+events();
+
+function init(){
+	mainArr = [];
+	for(var i=0;i<tb;i++){
+		var row = new Array(tb).fill(0);
+		mainArr.push(row);
+	}
+}
+function events(){
+	document.getElementById("begin").onchange = function(){begin = parseInt(this.value);};
+	document.getElementById("selectcolor").onchange = function(){color = this.value=="1"?{1:"#fff",2:"#000"}:{1:"#000",2:"#fff"};};
+	canvas.addEventListener("mousemove",mouseMove);
+	canvas.addEventListener("mouseout",function(){moveP = [-1,-1];});
+	document.getElementById("start").onclick = function(){
+		start = true;
+		if(begin==1){mainArr[9][9] = 1;}
+		canvas.addEventListener("click",click);
+		this.value = "重新开始";
+		this.onclick = function(){
+			canvas.removeEventListener("click",click);
+			init();
+			start = true;
+			if(begin==1){mainArr[9][9] = 1;}
+			canvas.addEventListener("click",click);
+		}
+	};
+}
+function click(event){
+	var x = event.clientX-14;
+	var y = event.clientY-14;
+	var px = parseInt(x/dw);
+	var py = parseInt(y/dw);
+	input(px,py);
+}
+function mouseMove(event){
+	var x = event.clientX-14;
+	var y = event.clientY-14;
+	var px = parseInt(x/dw);
+	var py = parseInt(y/dw);
+	moveP = [px,py];
+}
+function input(x,y){
+	if(mainArr[y][x]){return false;}
+	var win = judge(x,y,2)[5];
+	mainArr[y][x] = 2;
+	if(win){
+		setTimeout(function(){start = false;alert("you win");},100);
+		canvas.removeEventListener("click",click);
+		return false;
+	}
+	var p = ai();
+	canvas.removeEventListener("click",click);
+	setTimeout(function(){
+		mainArr[p[1]][p[0]] = 1;
+		if(p[2]){
+			setTimeout(function(){start = false;alert("you lose");},100);
+			return false;
+		}else{
+			canvas.addEventListener("click",click);
+		}
+	},750);
+}
+//绘制
+function draw(){
+	ctx.clearRect(0,0,640,640);
+	drawRect();
+	drawItems();
+	drawLocation();
+	requestAnimationFrame(draw);
+}
+//棋盘
+function drawRect(){
+	var len = dw*(tb-1);
+	ctx.lineWidth=1;
+	ctx.strokeStyle="#000";
+	for(var i=0;i<tb;i++){
+		ctx.beginPath();
+		ctx.moveTo(i*dw+os,os);
+		ctx.lineTo(i*dw+os,os+len);
+		ctx.moveTo(os,i*dw+os);
+		ctx.lineTo(os+len,i*dw+os);
+		ctx.stroke();
+		ctx.closePath();
+	}
+}
+//棋子
+function drawItems(){
+	for(var i=0;i<tb;i++){
+		for(var j=0;j<tb;j++){
+			if(mainArr[i][j]==1){
+				ctx.fillStyle = color[1];
+			}else if(mainArr[i][j]==2){
+				ctx.fillStyle = color[2];
+			}else{
+				continue;
+			}
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.arc(j*dw+os,i*dw+os,15,0,Math.PI*2,false);
+			ctx.fill();
+			ctx.stroke();
+			ctx.closePath();
+			ctx.beginPath();
+		}
+	}
+}
+//框框
+function drawLocation(){
+	if(!start){return false;}
+	var x = moveP[0];
+	var y = moveP[1];
+	if(x<0 || mainArr[y][x]){return false;}
+	x = x * dw + os;
+	y = y * dw + os;
+	ctx.strokeStyle="#ff6a44";
+	ctx.beginPath();
+	ctx.moveTo(x-15,y-5);
+	ctx.lineTo(x-15,y-15);
+	ctx.lineTo(x-5,y-15);
+	ctx.moveTo(x+5,y-15);
+	ctx.lineTo(x+15,y-15);
+	ctx.lineTo(x+15,y-5);
+	ctx.moveTo(x+15,y+5);
+	ctx.lineTo(x+15,y+15);
+	ctx.lineTo(x+5,y+15);
+	ctx.moveTo(x-5,y+15);
+	ctx.lineTo(x-15,y+15);
+	ctx.lineTo(x-15,y+5);
+	ctx.stroke();
+	ctx.closePath();
+}
+//选择最高分数
+function ai(){
+	var o = grade();
+	var arr1 = o.hisMax>=o.myMax?cGrade:pGrade;
+	var arr2 = o.hisMax>=o.myMax?pGrade:cGrade;
+	var max = o.hisMax>=o.myMax?o.hisMax:o.myMax;
+	var v = 0;
+	var p = [];
+	for(var i=0;i<tb;i++){
+		for(var j=0;j<tb;j++){
+			if(arr1[i][j] == max){
+				if(arr2[i][j]>v){
+					v = arr2[i][j];
+					p = [j,i];
+				}
+			}
+		}
+	}
+	if(o.hisMax>=o.myMax&&max==100000){p.push("win");}
+	return p;
+}
+//所有位置分数
+function grade(){
+	var myMax = 0;
+	var hisMax = 0;
+	for(var i=0;i<tb;i++){
+		cGrade[i] = [];
+		pGrade[i] = [];
+		for(var j=0;j<tb;j++){
+			if(mainArr[i][j]!=0){
+				cGrade[i][j] = 0;
+				pGrade[i][j] = 0;
+			}
+			var value1 = analysis(j,i,1);
+			var value2 = analysis(j,i,2);
+			
+			cGrade[i][j] = value1;
+			pGrade[i][j] = value2;
+			value1 > hisMax?hisMax=value1:null;
+			value2 > myMax?myMax=value2:null;
+		}
+	}
+	return {hisMax:hisMax,myMax:myMax};
+}
+//给位置打分
+function analysis(x,y,type){
+	if(mainArr[y][x]!=0){return 0;}
+	var o = judge(x,y,type);
+	if(o[5]){return 100000;}
+	if((o[40])||(o[41]>1)||(o[41]&&o[30])){return 10000;}
+	if(o[30]>1){return 5000;}
+	if(o[30]&&o[31]){return 1000;}
+	if(o[41]){return 400;}
+	if(o[30]){return 100;}
+	if(o[20]>1){return 50;}
+	if(o[20]){return 20;}
+	if(o[31]){return 15;}
+	if(o[21]){return 10;}
+	if(o[10]){return 5;}
+	if(o[11]){return 2;}
+	return 1;
+}
+//判断周围连续的棋子
+function judge(x,y,type){
+	var o = {
+		5:0,
+		40:0,
+		41:0,
+		42:0,
+		30:0,
+		31:0,
+		32:0,
+		20:0,
+		21:0,
+		22:0,
+		10:0,
+		11:0,
+		12:0
+	};
+	var row = 1;
+	var rowend = 0;
+	var col = 1;
+	var colend = 0;
+	var ld = 1;
+	var ldend = 0;
+	var rd = 1;
+	var rdend = 0;
+	var addnum = [];
+	//row
+	for(var rr=x+1;rr<tb;rr++){
+		addnum = add(rr,y,row,rowend);
+		row = addnum[0];
+		rowend = addnum[1];
+		if(addnum[2]){break;}
+	}
+	for(var rl=x-1;rl>=0;rl--){
+		addnum = add(rl,y,row,rowend);
+		row = addnum[0];
+		rowend = addnum[1];
+		if(addnum[2]){break;}
+	}
+	//col
+	for(var cu=y-1;cu>=0;cu--){
+		addnum = add(x,cu,col,colend);
+		col = addnum[0];
+		colend = addnum[1];
+		if(addnum[2]){break;}
+	}
+	for(var cd=y+1;cd<tb;cd++){
+		addnum = add(x,cd,col,colend);
+		col = addnum[0];
+		colend = addnum[1];
+		if(addnum[2]){break;}
+	}
+	//left down / right up
+	for(var ldx=x-1,ldy=y+1;ldx>=0&&ldy<tb;ldx--,ldy++){
+		addnum = add(ldx,ldy,ld,ldend);
+		ld = addnum[0];
+		ldend = addnum[1];
+		if(addnum[2]){break;}
+	}
+	for(var rux=x+1,ruy=y-1;rux<tb&&ruy>=0;rux++,ruy--){
+		addnum = add(rux,ruy,ld,ldend);
+		ld = addnum[0];
+		ldend = addnum[1];
+		if(addnum[2]){break;}
+	}
+	//right down / left up
+	for(var rdx=x+1,rdy=y+1;rdx<tb&&rdy<tb;rdx++,rdy++){
+		addnum = add(rdx,rdy,rd,rdend);
+		rd = addnum[0];
+		rdend = addnum[1];
+		if(addnum[2]){break;}
+	}
+	for(var lux=x-1,luy=y-1;lux>=0&&luy>=0;lux--,luy--){
+		addnum = add(lux,luy,rd,rdend);
+		rd = addnum[0];
+		rdend = addnum[1];
+		if(addnum[2]){break;}
+	}
+	
+	function add(x,y,r,re){
+		var p = mainArr[y][x];
+		var b = false;
+		if(p==type){
+			r++;
+		}else{
+			b = true;
+			if(p!=0||y>=tb||x>=tb||x<0||y<0){
+				re++;
+			}
+		}
+		return [r,re,b];
+	}
+	function test(n,e){
+		if(n>=5){o[5]++;}
+		else{o[n*10+e]++;}
+	}
+	test(row,rowend);
+	test(col,colend);
+	test(ld,ldend);
+	test(rd,rdend);
+	return o;
+}
+</script>
+</body>
+</html>

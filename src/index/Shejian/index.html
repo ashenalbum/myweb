@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>title</title>
+    <meta charset="utf-8">
+    <title>反身而诚 - 射箭</title>
+    <meta name="keywords" content="射箭游戏">
+    <style>
+        body{margin:0;padding:0;user-select: none;-webkit-user-select: none;}
+        canvas{display:block;}
+        div{position:absolute;left:20px;top:10px;}
+        a{position:absolute;right:20px;top:20px;}
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="800" height="400"></canvas>
+<div id="div">命中：0</div>
+<script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var stageW = window.innerWidth;
+    var stageH = window.innerHeight;
+    var center = {x:80,y:300};
+    var mousePoint = {x:0,y:0};
+    var waiting = false;
+    var jArr = {};
+    var endArr = [];
+    var g = 0.1;
+    var j_l1 = 4;
+    var j_l2 = 40;
+    var m;
+    var qiang;
+    var mz = 0;
+    var J = function(){
+        this.x = 100;
+        this.y = 300;
+        this.f = 5;
+        this.row = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.id = new Date().getTime();
+        this.read = function(){
+            this.row = 1.5*Math.PI-Math.atan2(mousePoint.x-center.x,mousePoint.y-center.y);
+            if(this.f<20){this.f += 0.2;}
+            this.x = center.x-(Math.cos(this.row))*(84-this.f*1.2);
+            this.y = center.y-(Math.sin(this.row))*(84-this.f*1.2);
+        };
+        this.begin = function(){
+            this.vx = -Math.cos(this.row)*this.f;
+            this.vy = -Math.sin(this.row)*this.f;
+        };
+        this.move = function(){
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += g;
+            this.row = 1.5*Math.PI-Math.atan2(this.vx,this.vy);
+            if(this.x<=0||this.x>=stageW){
+                this.vx *= -1;
+                this.y+= this.vy/3;
+            }
+        };
+    };
+    function mousedown(){
+        mousePoint.x = event.clientX-canvas.offsetLeft;
+        mousePoint.y = event.clientY-canvas.offsetTop;
+        if(!waiting){
+            waiting = new J();
+        }
+        canvas.addEventListener("mousemove",mousemove);
+    }
+    function mousemove(event){
+        mousePoint.x = event.clientX-canvas.offsetLeft;
+        mousePoint.y = event.clientY-canvas.offsetTop;
+    }
+    function mouseup(){
+        if(waiting){
+            waiting.begin();
+            jArr[waiting.id] = waiting;
+            waiting = false;
+        }
+        canvas.removeEventListener("mousemove",mousemove);
+    }
+    function frame(){
+        if(waiting){waiting.read();}
+        for(var i in jArr){
+            var j = jArr[i];
+            j.move();
+            if(test(j.x,j.y,m.x,m.y,m.width,m.height)){
+                m.setPosition();
+                mz++;
+                document.getElementById("div").innerHTML = "命中："+mz;
+            }
+            if(j.y>=stageH || test(j.x,j.y,qiang.x,qiang.y,qiang.width,qiang.height)){
+                j.die = 200;
+                endArr.push(j);
+                delete jArr[i];
+            }
+        }
+        if(endArr.length && endArr[0].die<=0){endArr.shift();}
+        draw();
+        requestAnimationFrame(frame);
+    }
+    function draw(){
+        ctx.clearRect(0,0,stageW,stageH);
+        if(waiting){
+            var sin = Math.sin(waiting.row);
+            var cos = Math.cos(waiting.row);
+            ctx.beginPath();
+            ctx.moveTo(waiting.x-j_l1*cos,waiting.y-j_l1*sin);
+            ctx.lineTo(waiting.x+j_l2*cos,waiting.y+j_l2*sin);
+            ctx.stroke();
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.moveTo(waiting.x+j_l2*cos,waiting.y+j_l2*sin);
+            ctx.arc(center.x,center.y,56,waiting.row-0.8+Math.PI,waiting.row+0.8+Math.PI);
+            ctx.lineTo(waiting.x+j_l2*cos,waiting.y+j_l2*sin);
+            ctx.stroke();
+            ctx.closePath();
+        }else{
+            ctx.beginPath();
+            ctx.arc(center.x,center.y,56,-0.8,0.8);
+            ctx.stroke();
+            ctx.closePath();
+        }
+        for(var i in jArr){
+            var j = jArr[i];
+            var jsin = Math.sin(j.row);
+            var jcos = Math.cos(j.row);
+            ctx.beginPath();
+            ctx.moveTo(j.x-j_l1*jcos,j.y-j_l1*jsin);
+            ctx.lineTo(j.x+j_l2*jcos,j.y+j_l2*jsin);
+            ctx.stroke();
+            ctx.closePath();
+        }
+        for(var k in endArr){
+            var e = endArr[k];
+            e.die--;
+            var esin = Math.sin(e.row);
+            var ecos = Math.cos(e.row);
+            ctx.beginPath();
+            ctx.moveTo(e.x-j_l1*ecos,e.y-j_l1*esin);
+            ctx.lineTo(e.x+j_l2*ecos,e.y+j_l2*esin);
+            ctx.stroke();
+            ctx.closePath();
+        }
+        ctx.beginPath();
+        ctx.fillStyle = "#cc00ff";
+        ctx.rect(m.x,m.y,m.width,m.height);
+        ctx.fill();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.fillStyle = "#00ccff";
+        ctx.rect(qiang.x,qiang.y,qiang.width,qiang.height);
+        ctx.fill();
+        ctx.closePath();
+    }
+    function init(){
+        canvas.width = stageW;
+        canvas.height = stageH;
+        center = {x:120,y:stageH-140};
+        canvas.addEventListener("mousedown",mousedown);
+        canvas.addEventListener("mouseup",mouseup);
+        qiang = {width:20,height:stageH*0.4,x:stageW/2-10,y:stageH*0.6};
+        m = {width:30,height:30,x:0,y:0};
+        m.setPosition = function(){
+            this.x = stageW/2+10+Math.random()*(stageW/2-10-this.width);
+            this.y = Math.random()*(stageH-this.height);
+        };
+        m.setPosition();
+        frame();
+    }
+    init();
+    function test(x1,y1,x2,y2,w,h){
+        return (x1>=x2 && x1<=x2+w && y1>=y2 && y1<=y2+h);
+    }
+</script>
+</body>
+</html>

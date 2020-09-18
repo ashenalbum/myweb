@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html class="ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html> <!--<![endif]-->
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>反身而诚-相册</title>
+    <meta name="keywords" content="反身而诚,js小游戏,相册留言">
+    <meta name="description" content="反身而诚的个人空间网站，有js小游戏和相册和留言">
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/live2d.css"/>
+    <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/>
+    <style>
+        #loadingpage{position:absolute;z-index:3; background:#eeeeee; box-sizing:border-box; padding:50px; width:100%;height:100%; display:flex; align-items:center; justify-content:center; text-align:center;}
+        #content .bg_canvas{background:#fefefe url('../src/public/public/bg-min.jpg') repeat center center;}
+        .bookbox{position:absolute;top:50%;left:50%;}
+        #book{-webkit-touch-callout: none; user-select: none; transition:margin-left 1s;}
+        #book .page{ box-shadow:0 0 20px rgba(0,0,0,0.2); overflow:hidden; background:#ead3aa url(../src/album/_book/old-paper.jpg) no-repeat; background-size:100% 100%;}
+        .bookbox .bookmark{position:absolute; top:100%; left:50%; width:30px; height:40px; margin-left:2px; background:url("../src/album/_book/bookmark.gif") no-repeat center 0; background-size:100% 90%; cursor:pointer; transform: scaleX(-1); transition:transform 0.7s, margin 0.7s;}
+        .bookbox .bookmark.back{transform:scaleX(1); margin-left:-34px;}
+        .bookbox .prev{width:22px;height:100%;border-radius: 15px 0 0 15px;position:absolute;left:-22px;}
+        .bookbox .prev:hover{background:rgba(0,0,0,0.2) url("../src/album/_book/arrows.gif") no-repeat -4px center;}
+        .bookbox .next{width:22px;height:100%;border-radius: 0 15px 15px 0;position:absolute;right:-22px;}
+        .bookbox .next:hover{background:rgba(0,0,0,0.2) url("../src/album/_book/arrows.gif") no-repeat -38px center;}
+        #book .shadow{-webkit-box-shadow: 0 4px 20px #000;-moz-box-shadow: 0 4px 20px #000;-ms-box-shadow: 0 4px 20px #000;-o-box-shadow: 0 4px 20px #000;box-shadow: 0 4px 20px #000;}
+        #book .page-wrapper{-webkit-perspective:2000px;-moz-perspective: 2000px;-ms-perspective: 2000px;perspective: 2000px;}
+        #book .maxPage{width:100%;height:100%;}
+        #book .photo{position:absolute;width:92%;height:90%;left:4%;top:5%;overflow:hidden;text-align:center; display:flex; flex-direction:column; justify-content:center;}
+        #book .photo img{cursor:pointer;}
+        /* #book .photo .paper{background:url(../src/album/_book/paper-bg.jpg) no-repeat; background-size:100% 100%;} */
+        #book .photo .paper.type1{width:100%; height:100%; position:relative;}
+        #book .photo .paper.type2{height:48%; width:100%; position:absolute; left:0; top:0;}
+        #book .photo .paper.type2+.type2{top:auto; bottom:0;}
+        #book .img{position:absolute; max-width:100%; max-height:100%; top:0px; left:0px; right:0px; bottom:0px; margin:auto;}
+        #book .idx{position:absolute;bottom:0;height:25px;padding:2px 10px;font-size:20px;line-height:25px;}
+        #book .even .gradient{position: absolute;top: 0;left: 0;width: 100%;height: 100%;background: url("../src/album/_book/right_border.png") repeat-y right top;}
+        #book .odd .gradient{position: absolute;top: 0;left: 0;width: 100%;height: 100%;background: url("../src/album/_book/left_border.png") repeat-y left top;}
+        #book .even .idx{left:0;text-align:left;font-size:14px;}
+        #book .odd .idx{right:0;text-align:right;font-size:14px;}
+
+        #book .catalog{position:absolute;width:94%;height:94%;left:3%;top:3%;}
+        #book .catalog .title{height:40px;text-align:center;font-size:32px;}
+        #book .catalog a{display:block;margin-bottom:6px;height:28px;font:16px/24px "Microsoft YaHei","Arial Narrow"; display:flex; flex-direction:row;}
+        #book .catalog a:link,#book .catalog a:visited,#book .catalog a:active{color:#000000;}
+        #book .catalog a:hover{color:#ff5555;}
+        #book .catalog a .line{float:left; flex:1; height:28px; background:url("../src/album/_book/catalogLine.gif") repeat-x 0 0;}
+        #book .catalog a:hover .line{background-position-y:-28px;}
+        #book .catalog a .name{float:left; padding:0 10px;}
+        #book .catalog a .i{float:right; padding-left:10px;}
+        #book .endtxt{position:absolute;right:0;bottom:50px;padding-right:12%;font-size:18px;line-height:150%; cursor:pointer; user-select:none;}
+        /* #book .endtxt:hover{color:#ff5555;} */
+
+        @font-face {font-family: "iconfont";
+            src: url('iconfont.eot?t=1553134043313'); /* IE9 */
+            src: url('iconfont.eot?t=1553134043313#iefix') format('embedded-opentype'), /* IE6-IE8 */
+            url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAALwAAsAAAAABwwAAAKkAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCCfgqBaIFTATYCJAMMCwgABCAFhG0HShslBsiusCnDvWiDzY2jHRdiYXptMT4IUTz8tx/tvplZ1SZiUfT09WQOnE5p0CqJRl8SXTRv/v7/37yvNci2dvwHGo5t0+JpUkQBFkgnzq/20wBeWhZmZ6qDssgK7cd3FzjIbPYXWBhXZdouzNvcEisrNxEAk//ncnoroCyaHyjHvWiNQb0ovOKAAhxrUWQlknkq4qW7yOMEGvWz0N757UOppbDHBeLdxCSlVsGhKGK4XqhtWFoQH9WoT3sSH6Lvx3/L0YKkJsOeuv9wlpcOf/td/q1yFiCcBFpdg4xZUIjTxsC+qhCpvMZAzSgcq1/wu6rit0AvjkpLxF/npjaDSZKkJ+J5Uo/GoxckkEEt6rEGDojSHV+UBlWSaNpUUZTvV6oc5WXFmVBV2p9qcHq3VGrJ2lDt4HE9R9T7x1InG9R699GRHXzvHY7e9fVh1/5/9PcfSA9Lhas/e6OrePQfksC+9CENh16F9rxVJyyMlVB9zUcGqpfoF4Tg08VptLr7ShcA394ItuqlwDJB/Q0Yg5/JG9hQDIGty0XjelzLmPXn4iQ0GmYV29LpmS7vGewj1Bd4IiR1+iCrN4oWyizUaLIKteptQqMZ4eomXXpVUVQwbQaEdickrT5D1u5CC+WGGr0+qNUeVWh0GptbNhmPiTphJIKc0jdqsuC1axAVp9/BFDbhvCCiP4EXEzf584vl8AU8eIkZw7MZjaKp5OCI4TRYG6jlMEUmvVpkvu0uPDS9qZcFV1J2MUgIyJHUG9LIBJ4OOgtV+fwdMApWgjvq6pxPgC1Meic+hzcAvZD6QXWP8srgmTEyEhopscAhDIPAsgLSNg+agozoqSf45ra5TrNyqLS3vdz93y5oZF+RgyOeBDQ9FNZ2h4wBv5ElPkOhuqwplQA=') format('woff2'),
+            url('iconfont.woff?t=1553134043313') format('woff'),
+            url('iconfont.ttf?t=1553134043313') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+            url('iconfont.svg?t=1553134043313#iconfont') format('svg'); /* iOS 4.1- */
+        }
+        .iconfont {font-family: "iconfont" !important;font-style: normal;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;}
+        .icon-full-screen:before {content: "\e758";}
+        .icon-cancel-full-screen:before {content: "\e759";}
+        .full-screen-btn{position:absolute;right:30px;top:30px;font-size:30px;color:#fff;cursor:pointer;}
+    </style>
+</head>
+<body>
+<div id="header" style="display:block;">
+    <img src="../src/public/public/head-l.png" class="bg-l"/>
+    <img src="../src/public/public/head-r.png" class="bg-r"/>
+    <img src="../src/public/public/head-t.png" class="bg-t"/>
+    <div class="profile">
+        <div class="box">
+            <div class="rect rect_1"><img _src="../src/public/headerbox/1.jpg"/></div>
+            <div class="rect rect_2"><img _src="../src/public/headerbox/2.jpg"/></div>
+            <div class="rect rect_3"><img _src="../src/public/headerbox/3.jpg"/></div>
+            <div class="rect rect_4"><img _src="../src/public/headerbox/4.jpg"/></div>
+            <div class="rect rect_5"><img _src="../src/public/headerbox/5.jpg"/></div>
+            <div class="rect rect_6"><img _src="../src/public/headerbox/6.jpg"/></div>
+        </div>
+        <div class="spliteBall_up"></div>
+        <div class="spliteBall_down"></div>
+    </div>
+    <div class="menu">
+        <!-- <a href="/"><span>滥觞</span></a> -->
+        <a class="active" href="/album"><span>相册</span></a>
+        <a href="/notes"><span>树洞</span></a>
+    </div>
+    <div class="showphoto">
+        <img src="../src/public/headerbox/1.jpg"/>
+    </div>
+</div>
+<div id="content">
+    <div class="bg_points" style="opacity:1;display:none;"></div>
+    <canvas id="bgcanvas" class="bg_canvas"></canvas>
+    <div class="cont" style="overflow: hidden;">
+        <!--正文-->
+        <div id="bookbox" >
+            <div id="book">
+                <div  class="prev" ignore="1"></div>
+                <div  class="next" ignore="1"></div>
+                <div class="bookmark" title="相册目录" ignore="1"></div>
+                <div class="hard"><img class="maxPage" src="../src/album/_book/_cover.jpg"/></div>
+                <div class="hard">
+                    <img class='maxPage' src="../src/album/_book/page.png"/>
+                    <div class="gradient"></div>
+                </div>
+                <div><div class="gradient"></div>
+                    <div class="catalog">
+                        <p class="title">相册目录</p>
+                    </div>
+                    <!-- <div style="position:absolute;bottom:0;width:96%;margin-left:2%;text-align:right;color:#999999;line-height:30px;font-family:'SimSun','Microsoft YaHei'">
+                        <span> 翻页： 滑动/滚轮/方向键/书边/页脚 </span>
+                        <span style="float:left;font-size:14px;">↓↓书签返回目录</span>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+        <span class="iconfont icon-full-screen full-screen-btn" id="fullscreen"></span>
+    </div>
+    <div id="loadingpage" class="cont-bgcolor">
+        <img src="../src/public/public/loading.gif" />
+    </div>
+    <div id="landlord">
+        <div class="message" style="display:none;"></div>
+        <canvas id="live2d" width="200" height="300"  class="live2d"></canvas>
+        <div id="chat" style="display:none;">
+            <span class="iconfont icon-enter enter"></span>
+            <input class="txt" type="text" placeholder="快来和我聊天吧"/>
+            <input class="btn" type="button" value="ok"/>
+        </div>
+    </div>
+</div>
+<audio id="bgm" autoplay></audio>
+<script type="text/javascript" src="../js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../js/main.js"></script>
+<script src="../js/turn.min.js"></script>
+<script>
+    var photoArr;
+    var meidaLocation = "../src/album/medium/";
+    var fullPage = false;
+
+    $(function(){
+        $.ajax({
+            url:"../src/album/album.json",
+            type:"post",
+            dataType:"json",
+            success:function(data){
+                photoArr = data;
+                pageInit();
+                $("#fullscreen").click(setFullScreen);
+            },
+            error:function(error){Mask("获取相片失败！");}
+        });
+    });
+    function pageInit(){
+        if(lowIE){alert("检测到您正使用低版本IE浏览器\n强烈建议使用高级浏览器访问");}
+        $("#bookbox").addClass("bookbox");
+
+        var book = $("#book");
+        var height = content.height()-80;
+        var width = parseInt(height/1.414*2);
+        var pageLength = 3;
+        var nowPage = 1;
+
+        init();
+        function init(){
+            //if(height>=810){meidaLocation="../src/album/medium/"}
+            if(width%2===1){width++;}
+            var catalog = book.find(".catalog");
+            var index = 0;
+            for(var i in photoArr){
+                var a = photoArr[i];
+                catalog.append('<a href="javascript:void 0;" goto="'+(index+3+1)+'">'+
+                    '<span class="name">'+a.name+'</span>'+
+                    '<div class="line"></div>'+
+                    '<span class="i">'+(index+1)+'</span>'+
+                '</a>');
+                index += a.list.length;
+            }
+            catalog.append('<a href="javascript:void 0;" goto="'+(index+3+1)+'">'+
+                '<span class="name">尾页</span>'+
+                '<div class="line"></div>'+
+                '<span class="i">'+(index+1)+'</span>'+
+            '</a>');
+            pageLength += index;
+            pageLength += 3;
+            if(pageLength%2===1){
+                pageLength++;
+                photoArr[photoArr.length-1].list.push({u:"../_book/fill.jpg"});
+            }
+            //catalog.append('<b style="position:absolute;right:0;bottom:0;color:#ff0000;font-size:20px;">&gt;&gt;&gt;&gt;</b>');
+        }
+
+        //book.children(".double").css({width:width+"px",height:height+"px"});
+        //book.find('.double').scissor();
+        //display: 'single'
+
+        book.css({left:-width/2+"px",top:-height/2+"px"}).turn({
+            width:width,
+            height:height,
+            duration:600,
+            autoCenter: true,
+            pages:pageLength
+        });
+        book.bind("missing",function(e,pages){
+            for (var i = 0; i < pages.length; i++) {
+                /*if(pages[i]==pageLength-2){
+                    book.turn("addPage",$("<div class='page'><div class=\"gradient\"></div><div style='position:absolute;bottom:50px;padding-left:100px;font-size:18px;line-height:150%;'>到了这里......<br/>应该写两句听起来很有文采的话<br/>——然而并没有</div></div>"),pageLength-2);return false;
+                }else if(pages[i]==pageLength-1){
+                    book.turn("addPage",$("<div class=\"hard\"><div class=\"gradient\"></div><img class='maxPage' src=\"src/album/_book/theend.png\"/></div>"),pageLength-1);return false;
+                }else if(pages[i]==pageLength){
+                    book.turn("addPage",$("<div class=\"hard\"><img class='maxPage' src=\"src/album/_book/_endpage.jpg\"/></div>"),pageLength);return false;
+                }*/
+                var p = pages[i]-4;
+                var obj = null; //photoArr.page[p];
+                var index = 0;
+                for(var j in photoArr){
+                    var ls = photoArr[j].list;
+                    if(p>=ls.length){
+                        p -= ls.length;
+                    }else{
+                        obj = ls[p];
+                        break;
+                    }
+                }
+
+                if(obj instanceof Array){
+                    var img = '<div class="paper '+(obj[1]?'type2':'type1')+'">'+
+                        '<img class="img" mytitle="'+(obj[0].title ||"")+'" onmouseover="showTitle(this)" src="'+meidaLocation+obj[0].u+'" />'+
+                    '</div>';
+                    if(obj[1] && obj[1].u){
+                        var title = obj[1].title || "";
+                        img = img + '<div class="paper type2">'+
+                            '<img class="img" mytitle="'+title+'" onmouseover="showTitle(this)" src="'+meidaLocation+obj[1].u+'" />'+
+                        '</div>';
+                    }
+                    book.turn("addPage",$("<div class='page'>" +
+                        "<div class=\"gradient\"></div>" +
+                        "<div class='photo'>"+img+"</div>" +
+                        "<div class='idx'>—&nbsp;"+(pages[i]-3)+"&nbsp;—</div> " +
+                    "</div>"), pages[i]);
+                }else{
+                    book.turn("addPage",$('<div class="page">' +
+                        '<div class="gradient"></div>' +
+                        '<div class="photo">'+
+                            '<div class="paper type1">'+
+                                '<img class="img" mytitle="'+(obj.title||"")+'" onmouseover="showTitle(this)" src="'+ meidaLocation+obj.u +'"/>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="idx">— '+(pages[i]-3)+' —</div>'+
+                    '</div>'), pages[i]);
+                }
+            }
+        }).bind("turning",function(event,page){
+                var bookmark = book.children(".bookmark");
+                if(page>3&&(nowPage===2||nowPage===3)){
+                    bookmark.addClass('back');
+                }else if((page===2||page===3)&&nowPage!==1){
+                    bookmark.removeClass('back');
+                }
+                nowPage = page;
+            }).bind("end",function(){
+            var next = book.children(".next");
+            var prev = book.children(".prev");
+            if(book.turn("page")>=book.turn("pages")-2){next.hide()}else{next.show()}
+            if(book.turn("page")<=3){prev.hide()}else{prev.show()}
+        });
+        book.children(".bookmark").click(function(){book.turn("page",3)});
+        book.turn("addPage",$("<div class='page'><div class=\"gradient\"></div><div class='endtxt' onclick='setalbum()'>但行好事<br/><i style='padding:0.5em 1em;'></i>莫问前程</div></div>"),pageLength-2);
+        book.turn("addPage",$("<div class=\"hard\"><img class='maxPage' src=\"../src/album/_book/_endpage.jpg\"/></div>"),pageLength);
+        book.turn("addPage",$("<div class=\"hard\"><div class=\"gradient\"></div><img class='maxPage' src=\"../src/album/_book/theend.gif\"/></div>"),pageLength-1);
+        //前后翻页
+        var wheelTime = new Date().getTime();
+        book.children(".next").click(function(){book.turn("next")});
+        book.children(".prev").click(function(){book.turn("previous")}).hide();
+        ///document.body.onmousewheel = function(event){
+        $(document).on("mousewheel",function(e){
+            var time = new Date().getTime();
+            if(time-wheelTime<500){return false;}else{wheelTime = time}
+            var up = (e.originalEvent.wheelDelta && (e.originalEvent.wheelDelta > 0 ? 1 : -1))|| (e.originalEvent.detail && (e.originalEvent.detail > 0 ? -1 : 1));
+            if(up<0){book.turn("next")}else{book.turn("previous")}
+            return false;
+        });
+        $("body").keydown(function(event){
+            var time = new Date().getTime();
+            if(time-wheelTime<500){return false;}else{wheelTime = time}
+            event = event || window.event;
+            switch(event.keyCode){
+                case 38:book.turn("previous");break;
+                case 37:book.turn("previous");break;
+                case 39:book.turn("next");break;
+                case 40:book.turn("next");break;
+            }
+        });
+
+        book.on("click","[goto]",function(){
+            var goto = $(this).attr("goto")||$(this).parent().attr("goto");
+            book.turn("page",parseInt(goto));
+        });
+        
+        var mouseX = 0;
+        var mouseY = 0;
+        book.on("mousedown",".img",function(event){
+            mouseX = event.screenX;
+            mouseY = event.screenY;
+        })
+        book.on("mouseup",".img",function(event){
+            if(!mouseX && !mouseY){return}
+            if(Math.abs(mouseX-event.screenX)>6){mouseX = mouseY = 0; return}
+            mouseX = mouseY = 0;
+
+            var img = new Image();
+            img.src = $(this).attr("src").replace(/small/,"medium");
+            Mask.add(img,fullPage?content:null);
+            img.onload = function(){
+                var imgWidth = img.width;
+                var imgHeight = img.height;
+                var contentWidth = content.width();
+                var contentHeight = content.height();
+                if(contentWidth/imgWidth>contentHeight/imgHeight){
+                    $(img).css({height:"100%"});
+                }else{
+                    var t = imgHeight*(contentWidth/imgWidth)/2;
+                    $(img).css({position:"absolute",top:"50%",left:0,width:"100%",marginTop:-t+"px"});
+                }
+            };
+            img.error = function(){
+                Mask.remove();
+                Mask("加载大图失败");
+            }
+        });
+        book.on("dragstart","img",function(){return false});
+        content.children(".cont-bgcolor").remove();
+    }
+
+    function showTitle(ts){
+        var str = ts.getAttribute('mytitle');
+        if(!str){return}
+        if(window.webglSupport){
+            var messageDom = $("#landlord .message");
+            messageDom.empty().html("<div class='line'><p class='fr'>"+str+"</p></div>").show();
+            window.clearTime = 4000;
+        }else{
+            ts.setAttribute("title",str);
+            ts.onmouseover = null;
+        }
+    }
+	//全屏
+	function fullScreen(){
+		var el = document.getElementById("content");
+		var rfs = el.requestFullScreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;      
+        if(typeof rfs != "undefined" && rfs) {
+            rfs.call(el);
+            fullPage = true;
+        }
+        return false;
+	}
+	function exitScreen(){
+        if(content.height()>=win.height()){
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();  
+            } else if (document.webkitCancelFullScreen) {  
+                document.webkitCancelFullScreen();  
+            } else if (document.msExitFullscreen) {  
+                document.msExitFullscreen();  
+            }
+        }
+        fullPage = false;
+        
+    }
+    function setFullScreen(){
+        fullPage?exitScreen():fullScreen();
+        $("#fullscreen").removeClass("icon-full-screen icon-cancel-full-screen").addClass(fullPage?"icon-cancel-full-screen":"icon-full-screen");
+    }
+    function setalbum(){
+        var key = prompt("口令:");
+        var newWindow = window.open();
+        $.ajax({
+            url: "../phps/testSetPwd.php",
+            type: "post",
+            data: {key: key},
+            dataType: "json",
+            success(data){
+                if(data.code!=0){Mask(data.msg);return}
+                var src = data.src;
+                newWindow.target = "_blank";
+                newWindow.location.href = src;
+            }
+        })
+    }
+</script>
+<script src="../js/touch.min.js"></script>
+<script>
+    var book = $("#book");
+    touch.on(book.get(0),"swipeleft",function(){
+        book.turn("next");
+    });
+    touch.on(book.get(0),"swiperight",function(){
+        book.turn("previous");
+    });
+</script>
+<script src="../src/public/live2d/live2d.js"></script>
+<script src="../src/public/live2d/setLive2.js"></script>
+<script src="../src/public/myplayer/myplayer.js"></script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1273638543'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273638543%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+</body>
+</html>

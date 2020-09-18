@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style>
+		body{margin:0;}
+		.rect{width:1100px;height:700px;display:block;box-shadow:0 0 12px #ccc;}
+		.btn{position:absolute;left:10px;top:10px;}
+	</style>
+</head>
+<body>
+<canvas id="canvas" width="1100" height="700" class="rect"></canvas>
+<input type="button" value="重新开始" onclick="again()" class="btn"/>
+<script src="Box2D.min.js"></script>
+<script type="text/javascript">
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+	var theBall;//母球
+	var ballArr = [];//子球
+	var move = true;//可以击球
+	var ballR = 12;//球半径
+	var power = {value:0,add:true,max:45,min:1};//力度
+	var rod = {img:null,l:60,show:0,x:0,y:0,mx:0,my:0};//球杆
+	var imgArr = [];
+	
+	var b2Vec2 = Box2D.Common.Math.b2Vec2;
+	var b2AABB = Box2D.Collision.b2AABB;
+	var b2BodyDef = Box2D.Dynamics.b2BodyDef;
+	var b2Body = Box2D.Dynamics.b2Body;
+	var b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
+	var b2Fixture = Box2D.Dynamics.b2Fixture;
+	var b2World = Box2D.Dynamics.b2World;
+	var b2MassData = Box2D.Collision.Shapes.b2MassData;
+	var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
+	var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
+	var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+	var b2MouseJointDef = Box2D.Dynamics.Joints.b2MouseJointDef;
+	
+	//设置重力,无重力（x方向，y方向）
+	var gravity = new b2Vec2(0,0);
+	//静止时进入睡眠状态
+	var sleep = true;
+	//创建世界
+	var world = new b2World(gravity,sleep);
+	//设定1米 = 30像素，将单位米转为像素
+	var worldScale = 30;
+	//创建刚体，可以多次使用
+	var bodyDef =new b2BodyDef();
+	//创建夹具，也可以多次使用
+	var fixtureDef = new b2FixtureDef();
+	fixtureDef.density=1;//密度
+	fixtureDef.restitution=0.75;//弹性 0-1
+	fixtureDef.friction=0.5;//摩擦 0-1
+	
+	function loading(){
+		var loadimg = new Image();
+		loadimg.src = "./img/gan.png";
+		loadimg.onload = function(){rod.img = this;imgArr.push(this);}
+		var imgid = 1;
+		
+		load();
+		function load(){
+			var img = new Image();
+			img.src = "./img/"+imgid+".png";
+			img.onload = function(){
+				imgArr.push(this);
+				if(imgid==15){init();}
+				else{
+					imgid++;
+					load();
+				}
+			}
+		}
+	}
+	
+	function init(){
+		//防止碰撞粘滞
+		Box2D.Common.b2Settings.b2_velocityThreshold = 0.01;
+	
+		qiang(304,99,456,1);
+		qiang(796,99,456,1);
+		qiang(304,599,456,1);
+		qiang(794,599,456,1);
+		qiang(50,350,1,452);
+		qiang(1050,350,1,452);
+
+		bodyDef.position.Set(300/worldScale,350/worldScale);
+		//刚体类型，可以受力
+		bodyDef.type=b2Body.b2_dynamicBody;
+		//创建形状 圆 半径=ballR
+		var circleShape =new b2CircleShape(ballR/worldScale);
+		fixtureDef.shape=circleShape;
+		//创建实体
+		theBall =world.CreateBody(bodyDef);
+		theBall.CreateFixture(fixtureDef);
+		theBall.SetLinearDamping(0.13);
+		theBall.SetAngularDamping(1);
+		
+		var ballNumber = ballLct();
+		for(var i=1;i<=5;i++){
+			for(var j=1;j<=i;j++){
+				var x = 700+i*(ballR*2/1.414);
+				var y = 350-(i*ballR)+(j*ballR*2)-ballR;
+				bodyDef.position.Set(x/worldScale,y/worldScale);
+				var b =world.CreateBody(bodyDef);
+				b.SetLinearDamping(0.13);
+				b.SetAngularDamping(1);
+				b.CreateFixture(fixtureDef);
+				b.message = ballNumber.shift();
+				ballArr.push(b);
+			}
+		}
+		
+		canvas.addEventListener("click",function(event){
+			if(!move){return false;}
+			move = false;
+			var speed = power.value;
+			var mx = event.clientX-canvas.offsetLeft;
+			var my = event.clientY-canvas.offsetTop;
+			var bx = theBall.GetPosition().x * worldScale;
+			var by = theBall.GetPosition().y * worldScale
+			var r = Math.atan2(by-my,bx-mx);
+			var vx = Math.cos(r) * speed;
+			var vy = Math.sin(r) * speed;
+			rod.l = ballR/2;
+			//唤醒目标，
+			theBall.SetAwake(true);
+			theBall.SetLinearVelocity(new b2Vec2(vx,vy), theBall.GetWorldCenter());
+		});
+		canvas.addEventListener("mousemove",function(event){
+			rod.mx = event.clientX-canvas.offsetLeft;
+			rod.my = event.clientY-canvas.offsetTop;
+		});
+		
+		//添加舞台
+		var debugDraw = new b2DebugDraw();
+		debugDraw.SetSprite(document.getElementById("canvas").getContext("2d"));
+		debugDraw.SetDrawScale(worldScale);
+		debugDraw.SetFillAlpha(0.1);
+		debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+		world.SetDebugDraw(debugDraw);
+		
+		update();
+	}
+	//重来
+	function again(){
+		theBall.SetPosition({x:300/worldScale,y:350/worldScale});
+		theBall.SetLinearVelocity(new b2Vec2(0,0), theBall.GetWorldCenter());
+		for(var b in ballArr){world.DestroyBody(ballArr[b]);};
+		ballArr = [];
+		var ballNumber = ballLct();
+		for(var i=1;i<=5;i++){
+			for(var j=1;j<=i;j++){
+				var x = 700+i*(ballR*2/1.414);
+				var y = 350-(i*ballR)+(j*ballR*2)-ballR;
+				bodyDef.position.Set(x/worldScale,y/worldScale);
+				var b =world.CreateBody(bodyDef);
+				b.SetLinearDamping(0.13);
+				b.SetAngularDamping(0.1);
+				b.CreateFixture(fixtureDef);
+				b.message = ballNumber.shift();
+				ballArr.push(b);
+			}
+		}
+	}
+	
+	//摆球
+	function ballLct(){
+		var arr = [];
+		var ballNumber = [];
+		for(var i=1;i<=15;i++){
+			if(i==8){continue;}
+			arr.push(i);
+		}
+		for(var j=0;j<15;j++){
+			if(j==4){
+				ballNumber.push(8);continue;
+			}
+			ballNumber.push(arr.splice(parseInt(Math.random()*arr.length),1)[0]);
+		}
+		return ballNumber;
+	}
+	
+	//创建墙
+	function qiang(x,y,w,h,){
+		bodyDef.position.Set(x/worldScale, y/worldScale);
+		bodyDef.type = b2Body.b2_staticBody;
+		var polygonShape = new b2PolygonShape();
+		polygonShape.SetAsBox(w/2/worldScale, h/2/worldScale);
+		fixtureDef.shape = polygonShape; // 复用夹具
+		var theFloor = world.CreateBody(bodyDef);
+		theFloor.CreateFixture(fixtureDef);
+	}
+	
+	
+	//循环帧
+	function update(){
+		//约束解算器
+		world.Step(1/30,10,10);
+		//力度
+		setPower();
+		//速度
+		setSpeed();
+		//显示刚体轮廓,测试用
+		//world.DrawDebugData();
+		//清除作用力
+        world.ClearForces();
+		//绘制
+		draw();
+		//动画
+		requestAnimationFrame(update);
+	}
+	
+	function draw(){
+		ctx.clearRect(0,0,1100,700);
+		//框
+		ctx.beginPath();
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = "#000";
+		var arr = [
+			[75,100],[532,100],[532,64],[568,64],[568,100],[1025,100],[1050,75],[1075,100],
+			[1050,125],[1050,575],[1075,600],[1050,625],[1025,600],
+			[568,600],[568,636],[532,636],[532,600],[75,600],[50,625],[25,600],[50,575],
+			[50,125],[25,100],[50,75],[75,100]
+		];
+		ctx.moveTo(75,100);
+		for(var i=1,len=arr.length;i<len;i++){
+			ctx.lineTo(arr[i][0],arr[i][1]);
+		}
+		ctx.stroke();
+		ctx.closePath();
+		//蓄力条
+		ctx.beginPath();
+		ctx.fillStyle = "#00aa00";
+		ctx.rect(800, 10, power.value*5, 30);
+		ctx.fill();
+		ctx.closePath();
+		ctx.beginPath();
+		ctx.strokeRect(800, 10, power.max*5, 30);
+		ctx.stroke();
+		ctx.closePath();
+		//母球
+		if(!theBall.remove){
+			var bp = theBall.GetPosition();
+			ctx.beginPath();
+			ctx.arc(bp.x*worldScale, bp.y*worldScale, ballR, 0, 2*Math.PI);
+			ctx.stroke();
+			ctx.closePath();
+		}
+		//子球
+		for(var ball in ballArr){
+			var b = ballArr[ball];
+			if(b.remove){continue};
+			var p = b.GetPosition();
+			var a = b.GetAngle();
+			ctx.beginPath();
+			ctx.save();
+            ctx.translate(p.x*worldScale,p.y*worldScale);
+            ctx.rotate(a);
+			//ctx.arc(p.x*worldScale, p.y*worldScale, ballR, 0, 2*Math.PI);
+			ctx.drawImage(imgArr[b.message],0, 0, 97, 97, -ballR, -ballR, ballR*2, ballR*2);
+            ctx.restore();
+			ctx.fill();
+			ctx.closePath();
+		}
+		//杆
+		if(move && (!theBall.remove) && rod.img){
+			rod.x = theBall.GetPosition().x * worldScale;
+			rod.y = theBall.GetPosition().y * worldScale;
+			rod.show = 30;//击球后显示帧数
+			rod.l = 60;//顶端与球距离
+		}
+		if(rod.show){
+			var rotate = Math.atan2(rod.my-rod.y,rod.mx-rod.x) - Math.PI/2;
+			ctx.beginPath();
+            ctx.save();
+            ctx.translate(rod.x,rod.y);
+            ctx.rotate(rotate);
+			ctx.drawImage(rod.img,0,0,20,410,-10,rod.l,20,410);
+            ctx.restore();
+			ctx.closePath();
+			rod.show--;
+		}
+	}
+	function setPower(){
+		if(power.add){
+			++power.value>=power.max?power.add = false:null;
+		}else{
+			--power.value<=power.min?power.add = true:null;
+		}
+	}
+	function setSpeed(){
+		var n = ballArr.length+1;
+		for(var i=0,len=ballArr.length;i<=len;i++){
+			var b = i==ballArr.length?theBall:ballArr[i];
+			if(b.remove){n--;continue}
+			var vx = Math.abs(b.GetLinearVelocity().x);
+			var vy = Math.abs(b.GetLinearVelocity().y);
+			var x = b.GetPosition().x * worldScale;
+			var y = b.GetPosition().y * worldScale;
+			if(x<50||x>1050||y<100||y>600){
+				if(b===theBall){
+					setTimeout(function(){
+						bodyDef.position.Set(500/worldScale,350/worldScale);
+						var circleShape =new b2CircleShape(ballR/worldScale);
+						fixtureDef.shape=circleShape;
+						//创建实体
+						theBall =world.CreateBody(bodyDef);
+						theBall.CreateFixture(fixtureDef);
+						theBall.SetLinearDamping(0.15);
+						theBall.SetAngularDamping(1);
+					},1000);
+				}
+				b.remove = true;
+				world.DestroyBody(b);
+			}
+			if(vx<0.2&&vy<0.2){
+				b.SetLinearVelocity(new b2Vec2(0,0),b.GetWorldCenter());
+				n--;
+			}
+		}
+		
+		move = n == 0;
+	}
+	
+	loading();
+</script>
+</body>
+</html>

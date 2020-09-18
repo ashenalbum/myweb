@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <style>
+		@font-face {font-family: "iconfont";
+			src: url('iconfont.eot?t=1599634808236'); /* IE9 */
+			src: url('iconfont.eot?t=1599634808236#iefix') format('embedded-opentype'), /* IE6-IE8 */
+			url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAPgAAsAAAAACJwAAAOTAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDFAqEYINxATYCJAMQCwoABCAFhG0HRhtZBxHVmy/JfiTGtmmyTNW8Zpm0k6gJHjCn/pMlp54c1x4QsbKxM6CkA6IjMByBP54TAItz9mpgVIQayVv06AspDtPs8D/HTJfPIy2/be1SGZY62hvgKIEG1I1XJXoHgrfMbWAVZcbEvOo2BKApQDlEsxbtuuGgYIsEIMaNHjkYp2VHzeAEjikyslMh1mHjWCutB8Da/O/FD6oIByxsCbur04jmw2j0WX6eKE3K0E8azH5ewN4HEigHKBCDRv19kGW+HBIdCisqABGUztormkrlqAnyyBi5qc4i/zwRgZVHAahGkhI+Sw4EfJ7AgQWfJxp4QLSa7wDpwHXgDXXkgwlGUCjtFPJiQTRTYHzHXHOhWPTgpTy2PyQjp5fITtTXYuezGtHzT/Khw8PmSHZX7XnZ3Lv9uqjtxo/Fjo5So3LK5NHwcDYrcUQ3SELGTN7oi2KZI3PtrZdKBPsv5FJbLhbPfOhyHzZtCpNCxDLiiVmxY/Ej5nB4tHu4dW32UE4/cQAf3Z9tbrqLjCD8W/Kmbb00yE0kzCatw2QsY3Z4NPnJnma/joZbc9gZ21wvviV75b9y5K2y7tq6IjrZ4MpEd3e5026J5vN+llBBo3KNUCV+Bd0KdftrTej27REStV4nJwXdC3X9diJo7q/zmxVqZpU33xU0D9YFDdOEUWl3cnMaMVs7mNDg5OPjk6jVYagaoUfYQ+20rvbpGjl/l/9dQa4584/3V/St559efNr33tAslboarYMMZaQ6nkaHWkMb6ZHl0G20f854PuMvd7H7l4SsZhIAqbhCTgOAOdYlSBnZSJofP4urrXM7A/16/zvuw3e8X7BzFt2RMgppAAcL0IrfrEA2qUjFHEoFaimPE4re/MtlFqDRQArCWfi0hzE7uhwEDtlrsEgjP0gciiEVthzYuFSDCA4NQVOWlvtdsjIFiVCZgDIsBRAEnAKLdC6DJOAhUmE/gk0OfkGEQEjQ9BBZT3QpIeRQnwglowH1h6CX2QoX10XlHd0+SmqqcvobKYcU9E3XLd1wRtpjTf64gdmCpWWCK9yH47jASktEzY1nXo9ta8feqNHLJGpxIpSMBtQfgl5mm7bnuvf7d3T7KGmmYSj+RspheOibDoG86WdUw7s8JH/cwGzB0jLBFbw48vwC6/i0iJobr5Fdjy1tZbH65nzj9IYHAC3Y6epgCSmUsCmyl7P2e+lxdmuQ0o5uz21CAAA=') format('woff2'),
+			url('iconfont.woff?t=1599634808236') format('woff'),
+			url('iconfont.ttf?t=1599634808236') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+			url('iconfont.svg?t=1599634808236#iconfont') format('svg'); /* iOS 4.1- */
+		}
+
+		.iconfont {font-family: "iconfont" !important; font-size: 16px; font-style: normal; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;}
+		.icon-del:before {content: "\e603";}
+		.icon-hengping:before {content: "\e66e";}
+		.icon-shuping:before {content: "\e66f";}
+
+		label{cursor:pointer;}
+		ul,li{display:block; list-style:none; padding:0;}
+		input,button{box-sizing:border-box;}
+		input[type='text']{border:1px solid #ccc;}
+		input[type='text']:focus{border:1px solid #333; outline:none;}
+		img{user-select:none;}
+		
+		#mulu{padding:10px; overflow-y:auto; border:1px solid #ccc;}
+        .list li{margin-top:12px; max-height:38px; overflow:hidden; transition:all 0.6s;}
+        .list li.active{max-height:none;}
+		.list li .arrow{float:left; width:24px; height:24px; margin:3px 10px 3px 3px; transition:transform 0.3s; cursor:pointer;}
+		.list li.active .arrow{transform:rotate(90deg);}
+        .list li .names{overflow:hidden; padding: 4px 0; cursor:pointer;}
+		.list li .names:hover{background: #f1f1f1;}
+		.list li .names .btn{height:30px; margin-left:20px;}
+		.list li .names .delli{font-size:22px; float:left; padding:4px; color:#666666; margin:0 5px;}
+		.list li .fx{float:left; width:24px; height:24px; padding:3px; margin-right:6px; cursor:pointer;}
+		.list li .fx.nv{visibility:hidden; cursor:inherit;}
+		.list li .block-ipt{display:block; width:150px; height:30px; margin-right:10px; float:left;}
+		.list li .key-ipt{display:block; width:100px; height:30px; float:left;}
+		.list li .form{margin-top:16px; padding-left:60px;}
+		.page{padding:0 0 10px 12px; margin-bottom:12px; border-bottom:1px solid #ccc; overflow:hidden;}
+		.page:last-child{padding-bottom:0;}
+		.page:last-child{border-bottom:none;}
+		.page .type{float:left; margin-right:10px; overflow:hidden;}
+		.page .type .ping{font-size:26px; float:left; padding:2px; color:#666666; margin:0 5px;}
+		.page .type .ping.active{color:#0088FE;}
+		.page .photo-box{overflow:hidden;}
+		.page .photo{overflow:hidden;}
+		.page .photo+.photo{margin-top:12px;}
+		.page .photo .file-box{float:left; margin-right:10px; position:relative; width:340px; height:30px; background:#eeeeee;}
+		.page .photo .file-box div{padding:0 4px; line-height:30px; font-size:16px;overflow:hidden; white-space:nowrap; text-overflow: ellipsis;}
+		.page .photo .file-box input[type='file']{position:absolute; top:0; left:0; width:100%; height:100%; opacity:0;}
+		.page .photo .file-box input[type='text']{box-sizing:border-box; width:100%; height:100%; border:none; font-size:14px; background:#eeeeee;}
+		.page .photo .yulan{float:left; height:30px; width:auto; margin-right:10px;}
+		.page .photo .file-note{width:160px; float:left; height:30px;}
+		.page .photo .del{font-size:22px; float:left; padding:4px; color:#666666; margin:0 5px;}
+
+		.adds{margin:10px 40px;}
+		.adds .submit{width:160px;}
+		.btn{height:30px; cursor:pointer;}
+		.yulan-box{display:none; position:fixed; top:0; left:0; bottom:0; right:0; background:rgba(0,0,0,0.5); z-index:9; align-items:center; justify-content:center;}
+		.yulan-box.show{display:flex;}
+		.yulan-box .yulan-img{max-width:100%; max-height:100%;}
+		.addpagebox{padding-left:60px; margin:10px 0;}
+		.addpagebox button{width:150px;}
+
+		.loading{display:none; position:fixed; top:0; left:0; bottom:0; right:0; background:rgba(0,0,0,0); z-index:99;}
+		.loading.show{display:block;}
+		.loading .loadtxt{position:absolute; left:50%; top:50%; margin:-50px 0 0 -50px; width:100px; height:100px; border-radius:10px; line-height:100px; text-align:center; background:rgba(0,0,0,0.5); color:#ffffff;}
+    </style>
+</head>
+<body>
+<div id="mulu">
+	<div class="adds">
+		<button class="btn" @click="addLb">添加类别</button>
+	</div>
+	<ul id="list" class="list">
+		<li class="li" :class="{active:activeLi==index}" v-for="(item,index) in photoArr" :key="index" >
+			<div class="names" @click.self="openGroup(index)">
+				<img src="../src/album/_book/arr-r.png" class="arrow" @click.self="openGroup(index)" />
+				<input type="text" class="block-ipt" placeholder="类别名称" v-model="item.name" />
+				<input type="text" class="key-ipt" placeholder="上传文件夹" v-model="item.key" />
+				<span class="iconfont icon-del delli" @click="removeGroup(index)"></span>
+				<img src="../src/album/_book/up.png" class="fx" :class="{nv:index==0}" @click.self="reverseGroup(index-1)" />
+				<img src="../src/album/_book/down.png" class="fx" :class="{nv:index==photoArr.length-1}" @click.self="reverseGroup(index)" />
+			</div>
+			<div class="addpagebox">
+				<button class="btn" @click="addPage(index)">添加页</button>
+			</div>
+			<div class="form">
+				<div class="page" v-for="(page,pid) in item.list" :key="pid">
+					<div class="type">
+						<img src="../src/album/_book/up.png" class="fx" :class="{nv:pid==0}" @click.self="reversePage(index,pid-1)" />
+						<img src="../src/album/_book/down.png" class="fx" :class="{nv:pid==item.list.length-1}" @click.self="reversePage(index,pid)" />
+						<span class="iconfont icon-shuping ping" :class="{active:!(page instanceof Array)}" @click="setPage(index,pid,1)"></span>
+						<span class="iconfont icon-hengping ping" :class="{active:page instanceof Array}" @click="setPage(index,pid,2)"></span>
+					</div>
+					<div class="photo-box">
+						<div v-if="!(page instanceof Array)" class="photo">
+							<div class="file-box">
+								<input type="file" @change="upfile(this,index,pid,1)" />
+								<input type="text" readonly v-model="page.u" placeholder="请上传" />
+							</div>
+							<img :src="'../src/album/medium/'+(page.u||'none.png')" class="yulan" @click="showImg"/>
+							<div style="float:right">
+								<input class="file-note" type="text" placeholder="==输入备注==" v-model="page.title" />
+								<span class="iconfont icon-del del delitem" @click="delPage(index,pid)"></span>
+							</div>
+						</div>
+						<div v-else>
+							<div class="photo">
+								<div class="file-box">
+									<input type="file" @change="upfile(this,index,pid,2,0)" />
+									<input type="text" readonly v-model="page[0].u" placeholder="请上传" />
+								</div>
+								<img :src="'../src/album/medium/'+(page[0].u||'none.png')" class="yulan" @click="showImg"/>
+								<div style="float:right">
+									<input class="file-note" type="text" placeholder="==输入备注==" v-model="page[0].title" />
+									<span class="iconfont icon-del del delitem" @click="delPage(index,pid,0)"></span>
+								</div>
+							</div>
+							<div v-if="page[1]" class="photo">
+								<div class="file-box">
+									<input type="file" @change="upfile(this,index,pid,2,1)" />
+									<input type="text" readonly v-model="page[1].u" placeholder="请上传" />
+								</div>
+								<img :src="'../src/album/medium/'+(page[1].u||'none.png')" class="yulan" @click="showImg"/>
+								<div style="float:right">
+									<input class="file-note" type="text" placeholder="==输入备注==" v-model="page[1].title" />
+									<span class="iconfont icon-del del delitem" @click="delPage(index,pid,1)"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</li>
+	</ul>
+	<div class="adds">
+		<button class="btn submit" @click="save">保存</button>
+		<button class="btn submit" @click="logs">打印</button>
+	</div>
+</div>
+<div id="yulanbox" class="yulan-box" onclick="hideShowbox(this)">
+	<img src="" class="yulan-img" />
+</div>
+<div id="loading" class="loading">
+	<div class="loadtxt">loading...</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="../js/jquery-1.12.4.min.js"></script>
+<script>
+var app = new Vue({
+	el: '#mulu',
+	data: {
+		activeLi: -1,
+		photoArr: [],
+		yulanbox: null
+	},
+	created(){
+		var ts = this;
+		loadingShow();
+		$.ajax({
+			url: "../src/album/album.json",
+			type: "post",
+			dataType: "json",
+			success(data){
+				loadingHide();
+				ts.photoArr = data;
+			},
+			error(){loadingHide()}
+		});
+	},
+	methods:{
+		openGroup(index){
+			if(this.activeLi==index){this.activeLi=-1;return}
+			this.activeLi = index;
+		},
+		removeGroup(index){
+			if(confirm("确定删除该类别？")){this.photoArr.splice(index,1)}
+		},
+		reverseGroup(index){
+			if(index<0 || index>=this.photoArr.length-1){return}
+			this.photoArr[index] = this.photoArr.splice(index+1, 1, this.photoArr[index])[0];
+			if(this.activeLi==index){this.activeLi++}
+			else if(this.activeLi==index+1){this.activeLi--}
+		},
+		reversePage(index,pid){
+			if(pid<0 || pid>=this.photoArr[index].list.length-1){return}
+			var list = this.photoArr[index].list;
+			list[pid] = list.splice(pid+1, 1, list[pid])[0];
+		},
+		addLb(){
+			this.photoArr.push({name:"", key:"", list:[]});
+		},
+		addPage(index){
+			this.photoArr[index].list.push({u:"",title:""});
+		},
+		delPage(index,pid,id){
+			if(!confirm("确定删除该图片？")){return}
+			var lb = this.photoArr[index].list;
+			var page = lb[pid];
+			if(page instanceof Array){
+				page.splice(id,1);
+				if(page.length==0){lb.splice(pid,1)}
+				else{lb[pid] = page[0]}
+			}else{
+				lb.splice(pid,1);
+			}
+		},
+		setPage(index,pid,id){
+			var li = this.photoArr[index]['list'];
+			var page = li[pid];
+			if(id==1 && page instanceof Array){
+				if(page.length==2){alert("请删除一条");return}
+				li.splice(pid,1,page[0]);
+			}
+			if(id==2){
+				if(!(page instanceof Array)){li.splice(pid,1,[page,{u:"",title:""}]);return}
+				if(page.length==1){page.push({u:"",title:""})}
+			}
+		},
+		showImg(e){
+			var src = e.target.src;
+			yulanbox.style.display = "flex";
+			yulanbox.children[0].src = src;
+		},
+		logs(){
+			console.log(this.photoArr);
+		},
+		save(){
+			for(var i=0; i<this.photoArr.length; i++){
+				var li = this.photoArr[i];
+				if(!li.name || !li.key || li.list.length==0){alert("有空数据，请检查");return}
+			}
+			var pasword = prompt("请输入口令");
+			loadingShow();
+			$.ajax({
+				url: "../phps/changeAlbum.php",
+				type: "post",
+				data: {
+					pasword: pasword,
+					json: this.photoArr
+				},
+				dataType: "json",
+				success(data){
+					loadingHide();
+					if(data.code!=0){alert(data.msg);return}
+					alert("修改完成！");
+				},
+				error(){loadingHide()}
+			})
+		},
+		upfile(ts,index,pid,type,id){
+			var file = event.target.files[0];
+			var key = this.photoArr[index].key;
+			if(!key){alert("请输入文件夹");return}
+
+			var formData = new FormData();
+			formData.append("file",file);
+			formData.append("key",key);
+
+			loadingShow();
+			var ts = this;
+			$.ajax({
+				url: "../phps/upfile.php",
+				type: "post",
+				processData: false,
+				contentType: false,
+				dataType: "json",
+				data: formData,
+				success(data){
+					loadingHide();
+					if(data.code!=0){alert(data.msg);return}
+					var src = data.src;
+					var p = ts.photoArr[index]['list'][pid];
+					if(type==1){
+						p.u = src;
+					}else{
+						p[id].u = src;
+					}
+				},
+				error(){loadingHide()}
+			})
+		}
+	},
+	mounted(){
+		this.yulanbox = document.getElementById("yulanbox");
+	}
+});
+
+function hideShowbox(ts){ts.style.display = "none"}
+function loadingShow(){$(document.body).children("#loading").addClass("show")}
+function loadingHide(){$(document.body).children("#loading").removeClass("show")}
+
+</script>
+</body>
+</html>

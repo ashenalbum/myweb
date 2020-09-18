@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>反身而诚-js中国象棋</title>
+    <meta name="keywords" content="反身而诚,js小游戏">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <style>
+        body{
+            -webkit-user-select:none;
+            -moz-user-select:none;
+            -ms-user-select:none;
+            user-select:none;
+        }
+        #qp{border:8px double #000000;position:relative;}
+        #qp .qz{position:absolute;top:0;left:0;box-sizing:border-box;margin:-20px 0 0 -20px;width:40px;height:40px;border-radius:50px;border:2px solid #000000;text-align:center;line-height:36px;font-size:20px;cursor:pointer;transition:all 0.3s;background:#ffffff;}
+        #qp .qz.active{outline:1px dashed #ff0000;}
+        #qp .red{color:#ff0000;}
+        #qp .point{display:none;position:absolute;top:0;left:0;margin:-20px 0 0 -20px;border:12px solid transparent;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.5);background-clip:padding-box;cursor:pointer;}
+        #qp .line{position:absolute;top:20px;left:20px;right:20px;bottom:20px;outline:1px solid #000;}
+        #qp .h{height:1px;background:#000;}
+        #qp .z ,
+        #qp .x{position:absolute;height:1px;width:1px;background:#000;}
+
+        .r_45{transform:rotate(45deg);}
+        .r_-45{transform:rotate(-45deg);}
+
+        .btnbox{margin-top:20px;}
+        .btnbox input{margin-right:20px;}
+
+        .message{padding:20px;position:absolute;left:0;right:0;bottom:20%;width:300px;margin:auto;text-align:center;background:rgba(0,0,0,0.6);color:#ffffff;border-radius:10px;}
+        label{cursor:pointer;}
+    </style>
+</head>
+<body>
+<div id="qp"></div>
+<div class="btnbox">
+    <input type="button" onclick="restart();" value="重新开始"/>
+    <input type="button" onclick="fanzhuan();" value="翻转"/>
+    <!--<label>自动翻转:<input id="autofz" type="checkbox"/></label>-->
+</div>
+<script>
+    var rectLen = 50;//棋盘格子长
+    var qp = document.getElementById("qp");
+    var points = [];//交叉点dom数组
+    var start = "red";//先走方
+    var qzDom = [];
+    var moveQz;
+    var chessArr = [];
+    //棋子类（x , y , 兵种 , 是否位于棋盘下方 , 是否红方）
+    var P = function(x,y,type,dir,red){
+        this.x = x?x:0;
+        this.y = y?y:0;
+        this.type = type;
+        //可以走的位置
+        this.stayArr = [];
+        this.dir = dir?1:0;
+        this.red = Boolean(red);
+        this.hide = false;
+        this.rotate = 0;//parseInt(Math.random()*360);
+        this.text = (function(t,r){
+            switch(t){
+                case 0:return "車";break;
+                case 1:return "馬";break;
+                case 4:return r?"相":"象";break;
+                case 5:return r?"士":"仕";break;
+                case 6:return r?"帥":"將";break;
+                case 2:return "炮";break;
+                case 3:return r?"兵":"卒";break;
+            }
+        })(type,red);
+        this.moveArr = {
+            0:function(){//車
+                this.stayArr = [];
+                var i=1,b=true;
+                for(i=1,b=true;b;i++){
+                    if(this.y-i<0){b=false;break;}
+                    if(chessArr[this.y-i][this.x]){
+                        chessArr[this.y-i][this.x].red!=this.red?this.stayArr.push({x:this.x,y:this.y-i}):false;
+                        b = false;
+                        break;
+                    }else{
+                        this.stayArr.push({x:this.x,y:this.y-i});
+                    }
+                }
+                for(i=1,b=true;b;i++){
+                    if(this.y+i>9){b=false;break;}
+                    if(chessArr[this.y+i][this.x]){
+                        chessArr[this.y+i][this.x].red!=this.red?this.stayArr.push({x:this.x,y:this.y+i}):false;
+                        b = false;
+                        break;
+                    }else{
+                        this.stayArr.push({x:this.x,y:this.y+i});
+                    }
+                }
+                for(i=1,b=true;b;i++){
+                    if(this.x-i<0){b=false;break;}
+                    if(chessArr[this.y][this.x-i]){
+                        chessArr[this.y][this.x-i].red!=this.red?this.stayArr.push({x:this.x-i,y:this.y}):false;
+                        b = false;
+                        break;
+                    }else{
+                        this.stayArr.push({x:this.x-i,y:this.y});
+                    }
+                }
+                for(i=1,b=true;b;i++){
+                    if(this.x+i>8){b=false;break;}
+                    if(chessArr[this.y][this.x+i]){
+                        chessArr[this.y][this.x+i].red!=this.red?this.stayArr.push({x:this.x+i,y:this.y}):false;
+                        b = false;
+                        break;
+                    }else{
+                        this.stayArr.push({x:this.x+i,y:this.y});
+                    }
+                }
+            },
+            1:function(){//馬
+                this.stayArr = [];
+                var meet;
+                if(this.y-1>0 && chessArr[this.y-1][this.x]==0){
+                    if(this.x>0){
+                        meet = chessArr[this.y-2][this.x-1];
+                        if(meet==0||(meet.red!=this.red)){
+                            this.stayArr.push({x:this.x-1,y:this.y-2});
+                        }
+                    }
+                    if(this.x<8){
+                        meet = chessArr[this.y-2][this.x+1];
+                        if(meet==0||(meet.red!=this.red)){
+                            this.stayArr.push({x:this.x+1,y:this.y-2});
+                        }
+                    }
+                }
+                if(this.y+1<9 && chessArr[this.y+1][this.x]==0){
+                    if(this.x>0){
+                        meet = chessArr[this.y+2][this.x-1];
+                        if(meet==0||(meet.red!=this.red)){
+                            this.stayArr.push({x:this.x-1,y:this.y+2});
+                        }
+                    }
+                    if(this.x<8){
+                        meet = chessArr[this.y+2][this.x+1];
+                        if(meet==0||(meet.red!=this.red)){
+                            this.stayArr.push({x:this.x+1,y:this.y+2});
+                        }
+                    }
+                }
+                if(this.x+1<8 && chessArr[this.y][this.x+1]==0){
+                    if(this.y>0){
+                        meet = chessArr[this.y-1][this.x+2];
+                        if(meet==0||(meet.red!=this.red)){
+                            this.stayArr.push({x:this.x+2,y:this.y-1});
+                        }
+                    }
+                    if(this.y<9){
+                        meet = chessArr[this.y+1][this.x+2];
+                        if(meet==0||(meet.red!=this.red)){
+                            this.stayArr.push({x:this.x+2,y:this.y+1});
+                        }
+                    }
+                }
+                if(this.x-1>0 && chessArr[this.y][this.x-1]==0){
+                    if(this.y>0){
+                        meet = chessArr[this.y-1][this.x-2];
+                        if(meet==0||(meet.red!=this.red)){
+                            this.stayArr.push({x:this.x-2,y:this.y-1});
+                        }
+                    }
+                    if(this.y<9){
+                        meet = chessArr[this.y+1][this.x-2];
+                        if(meet==0||(meet.red!=this.red)){
+                            this.stayArr.push({x:this.x-2,y:this.y+1});
+                        }
+                    }
+                }
+            },
+            2:function(){//炮
+                this.stayArr = [];
+                var i=1,b=true;
+                for(i=1,b=true;b;i++){
+                    if(this.y-i<0){b=false;break;}
+                    if(chessArr[this.y-i][this.x]){
+                        for(var j=1;this.y-i-j>=0;j++){
+                            if(chessArr[this.y-i-j][this.x]){
+                                if(chessArr[this.y-i-j][this.x].red!=this.red){
+                                    this.stayArr.push({x:this.x,y:this.y-i-j});
+                                }
+                                break;
+                            }
+                        }
+                        b = false;
+                        break;
+                    }else{
+                        this.stayArr.push({x:this.x,y:this.y-i});
+                    }
+                }
+                for(i=1,b=true;b;i++){
+                    if(this.y+i>9){b=false;break;}
+                    if(chessArr[this.y+i][this.x]){
+                        for(var j=1;this.y+i+j<=9;j++){
+                            if(chessArr[this.y+i+j][this.x]){
+                                if(chessArr[this.y+i+j][this.x].red!=this.red){
+                                    this.stayArr.push({x:this.x,y:this.y+i+j});
+                                }
+                                break;
+                            }
+                        }
+                        b = false;
+                        break;
+                    }else{
+                        this.stayArr.push({x:this.x,y:this.y+i});
+                    }
+                }
+                for(i=1,b=true;b;i++){
+                    if(this.x-i<0){b=false;break;}
+                    if(chessArr[this.y][this.x-i]){
+                        for(var j=1;this.x-i-j>=0;j++){
+                            if(chessArr[this.y][this.x-i-j]){
+                                if(chessArr[this.y][this.x-i-j].red!=this.red){
+                                    this.stayArr.push({x:this.x-i-j,y:this.y});
+                                }
+                                break;
+                            }
+                        }
+                        b = false;
+                        break;
+                    }else{
+                        this.stayArr.push({x:this.x-i,y:this.y});
+                    }
+                }
+                for(i=1,b=true;b;i++){
+                    if(this.x+i>8){b=false;break;}
+                    if(chessArr[this.y][this.x+i]){
+                        for(var j=1;this.x+i+j<=8;j++){
+                            if(chessArr[this.y][this.x+i+j]){
+                                if(chessArr[this.y][this.x+i+j].red!=this.red){
+                                    this.stayArr.push({x:this.x+i+j,y:this.y});
+                                }
+                                break;
+                            }
+                        }
+                        b = false;
+                        break;
+                    }else{
+                        this.stayArr.push({x:this.x+i,y:this.y});
+                    }
+                }
+            },
+            3:function(){//卒
+                this.stayArr = [];
+                if(this.dir==1?this.y-1>=0:this.y+1<=9){
+                    if(chessArr[this.y-(this.dir==1?1:-1)][this.x]==0 || chessArr[this.y-(this.dir==1?1:-1)][this.x].red!=this.red){
+                        this.stayArr.push({x:this.x,y:this.y-(this.dir==1?1:-1)});
+                    }
+                }
+                if(this.dir==1?this.y<=4:this.y>=5){
+                    if(this.x-1>=0){
+                        if(chessArr[this.y][this.x-1]==0 || chessArr[this.y][this.x-1].red!=this.red){
+                            this.stayArr.push({x:this.x-1,y:this.y});
+                        }
+                    }
+                    if(this.x+1<=8){
+                        if(chessArr[this.y][this.x+1]==0 || chessArr[this.y][this.x+1].red!=this.red){
+                            this.stayArr.push({x:this.x+1,y:this.y});
+                        }
+                    }
+                }
+            },
+            4:function(){//相
+                this.stayArr = [];
+                if(this.x-2>=0 && this.y-2>=(this.dir==1?4:0) && chessArr[this.y-1][this.x-1]==0 && (chessArr[this.y-2][this.x-2]==0||chessArr[this.y-2][this.x-2].red!=this.red)){
+                    this.stayArr.push({x:this.x-2,y:this.y-2});
+                }
+                if(this.x+2<9 && this.y+2<=(this.dir==1?9:4) && chessArr[this.y+1][this.x+1]==0 && (chessArr[this.y+2][this.x+2]==0||chessArr[this.y+2][this.x+2].red!=this.red)){
+                    this.stayArr.push({x:this.x+2,y:this.y+2});
+                }
+                if(this.x-2>=0 && this.y+2<=(this.dir==1?9:4) && chessArr[this.y+1][this.x-1]==0 && (chessArr[this.y+2][this.x-2]==0||chessArr[this.y+2][this.x-2].red!=this.red)){
+                    this.stayArr.push({x:this.x-2,y:this.y+2});
+                }
+                if(this.x+2<9 && this.y-2>=(this.dir==1?4:0) && chessArr[this.y-1][this.x+1]==0 && (chessArr[this.y-2][this.x+2]==0||chessArr[this.y-2][this.x+2].red!=this.red)){
+                    this.stayArr.push({x:this.x+2,y:this.y-2});
+                }
+            },
+            5:function(){//士
+                this.stayArr = [];
+                if(this.y<3){
+                    if(this.x==4){
+                        if(chessArr[0][3]==0 || chessArr[0][3].red!=this.red){this.stayArr.push({x:3,y:0})}
+                        if(chessArr[0][5]==0 || chessArr[0][5].red!=this.red){this.stayArr.push({x:5,y:0})}
+                        if(chessArr[2][3]==0 || chessArr[2][3].red!=this.red){this.stayArr.push({x:3,y:2})}
+                        if(chessArr[2][5]==0 || chessArr[2][5].red!=this.red){this.stayArr.push({x:5,y:2})}
+                    }else if(chessArr[1][4]==0 || chessArr[1][4].red!=this.red){
+                        this.stayArr.push({x:4,y:1});
+                    }
+                }else{
+                    if(this.x==4){
+                        if(chessArr[9][3]==0 || chessArr[9][3].red!=this.red){this.stayArr.push({x:3,y:9})}
+                        if(chessArr[9][5]==0 || chessArr[9][5].red!=this.red){this.stayArr.push({x:5,y:9})}
+                        if(chessArr[7][3]==0 || chessArr[7][3].red!=this.red){this.stayArr.push({x:3,y:7})}
+                        if(chessArr[7][5]==0 || chessArr[7][5].red!=this.red){this.stayArr.push({x:5,y:7})}
+                    }else if(chessArr[8][4]==0 || chessArr[8][4].red!=this.red){
+                        this.stayArr.push({x:4,y:8});
+                    }
+                }
+            },
+            6:function(){//将
+                this.stayArr = [];
+                if(this.x-1>=3 && (chessArr[this.y][this.x-1]==0 || chessArr[this.y][this.x-1].red!=this.red)){this.stayArr.push({x:this.x-1,y:this.y})}
+                if(this.x+1<=6 && (chessArr[this.y][this.x+1]==0 || chessArr[this.y][this.x+1].red!=this.red)){this.stayArr.push({x:this.x+1,y:this.y})}
+                if(this.y-1>=(this.red==1?7:0) && (chessArr[this.y-1][this.x]==0 || chessArr[this.y-1][this.x].red!=this.red)){this.stayArr.push({x:this.x,y:this.y-1})}
+                if(this.y+1<=(this.red==1?9:2) && (chessArr[this.y+1][this.x]==0 || chessArr[this.y+1][this.x].red!=this.red)){this.stayArr.push({x:this.x,y:this.y+1})}
+                for(var i=1;i<10;i++){
+                    var add = this.dir?-1*i:i;
+                    if(this.y+add>9||this.y+add<0){break;}
+                    if(chessArr[this.y+add][this.x]){
+                        if(chessArr[this.y+add][this.x].type == 6){
+                            this.stayArr.push({x:this.x,y:this.y+add});
+                        }
+                        break;
+                    }
+                }
+            }
+        };
+        this.move = this.moveArr[type];
+    };
+
+    init();
+    function init(){
+        qp.style.width = rectLen * 8 + 40 + "px";
+        qp.style.height = rectLen * 9 + 40 + "px";
+        drawLine();
+        addQz();
+        for(var i in document.getElementsByClassName("red")){
+            document.getElementsByClassName("red")[i].onclick = qzClick;
+        }
+    }
+    //重新开始
+    function restart(){
+        if(confirm("确定要重新开始？")){init()}
+    }
+    //画线
+    function drawLine(){
+        qp.innerHTML = "";
+        var line = document.createElement("div");
+        line.setAttribute("class","line");
+        qp.appendChild(line);
+        for(var i=0;i<8;i++){
+            var h = document.createElement("div");
+            h.setAttribute("class","h");
+            h.style.marginTop = rectLen - 1 + "px";
+            line.appendChild(h);
+        }
+        for(var j=0;j<8;j++){
+            var uz = document.createElement("div");
+            uz.setAttribute("class","upz z");
+            uz.style.height = rectLen * 4 + "px";
+            uz.style.top = 0;
+            uz.style.left = (j + 1) * rectLen + "px";
+            line.appendChild(uz);
+        }
+        for(var k=0;k<8;k++){
+            var dz = document.createElement("div");
+            dz.setAttribute("class","dnz z");
+            dz.style.height = rectLen * 4 + "px";
+            dz.style.top = rectLen * 5 + "px";
+            dz.style.left = (k + 1) * rectLen + "px";
+            line.appendChild(dz);
+        }
+        var x1 = document.createElement("div");
+        x1.w = Math.pow(2,0.5) * rectLen * 2;
+        x1.style.width = x1.w + "px";
+        x1.style.top = rectLen-1 + "px";
+        x1.style.left = rectLen * 4 - (x1.w/2) + "px";
+        x1.setAttribute("class","r_45 x");
+
+        var x2 = x1.cloneNode();
+        x2.setAttribute("class","r_-45 x");
+
+        var x3 = x1.cloneNode();
+        x3.style.top = rectLen * 8 -1 + "px";
+
+        var x4 = x3.cloneNode();
+        x4.setAttribute("class","r_-45 x");
+
+        line.appendChild(x1);
+        line.appendChild(x2);
+        line.appendChild(x3);
+        line.appendChild(x4);
+    }
+    //添加棋子
+    function addQz(){
+        qzDom = [];
+        chessArr = [];
+        points = [];
+        for(var i=0;i<10;i++){
+            qzDom.push([0,0,0,0,0,0,0,0,0]);
+            chessArr.push([0,0,0,0,0,0,0,0,0]);
+        }
+        var qzArr = [];
+        qzArr.push(new P(0,0,0,0,0));
+        qzArr.push(new P(8,0,0,0,0));
+        qzArr.push(new P(1,0,1,0,0));
+        qzArr.push(new P(7,0,1,0,0));
+        qzArr.push(new P(2,0,4,0,0));
+        qzArr.push(new P(6,0,4,0,0));
+        qzArr.push(new P(3,0,5,0,0));
+        qzArr.push(new P(5,0,5,0,0));
+        qzArr.push(new P(4,0,6,0,0));
+        qzArr.push(new P(1,2,2,0,0));
+        qzArr.push(new P(7,2,2,0,0));
+        qzArr.push(new P(0,3,3,0,0));
+        qzArr.push(new P(2,3,3,0,0));
+        qzArr.push(new P(4,3,3,0,0));
+        qzArr.push(new P(6,3,3,0,0));
+        qzArr.push(new P(8,3,3,0,0));
+
+        qzArr.push(new P(0,9,0,1,1));
+        qzArr.push(new P(8,9,0,1,1));
+        qzArr.push(new P(1,9,1,1,1));
+        qzArr.push(new P(7,9,1,1,1));
+        qzArr.push(new P(2,9,4,1,1));
+        qzArr.push(new P(6,9,4,1,1));
+        qzArr.push(new P(3,9,5,1,1));
+        qzArr.push(new P(5,9,5,1,1));
+        qzArr.push(new P(4,9,6,1,1));
+        qzArr.push(new P(1,7,2,1,1));
+        qzArr.push(new P(7,7,2,1,1));
+        qzArr.push(new P(0,6,3,1,1));
+        qzArr.push(new P(2,6,3,1,1));
+        qzArr.push(new P(4,6,3,1,1));
+        qzArr.push(new P(6,6,3,1,1));
+        qzArr.push(new P(8,6,3,1,1));
+
+        //添加棋子dom
+        for(var qz in qzArr){
+            var p = qzArr[qz];
+            chessArr[p.y][p.x] = p;
+            var q = document.createElement("div");
+            q.obj = p;
+            q.setAttribute("class","qz"+(p.red?" red":" black"));
+            q.style.top = p.y * rectLen + 20 + "px";
+            q.style.left = p.x * rectLen + 20 + "px";
+            q.style.transform = "rotate("+p.rotate+"deg)";
+            q.innerHTML = p.text;
+            qp.appendChild(q);
+            qzDom[p.y][p.x] = q;
+        }
+
+        //points
+        for(var p1 in chessArr){
+            var arr = [];
+            for(var p2 in chessArr[p1]){
+                var point = document.createElement("div");
+                point.setAttribute("class","point");
+                point.style.left = p2 * rectLen + 20 + "px";
+                point.style.top = p1 * rectLen + 20 + "px";
+                point.x = p2;
+                point.y = p1;
+                point.onclick = qzTo;
+                qp.appendChild(point);
+                arr.push(point);
+            }
+            points.push(arr);
+        }
+    }
+    //棋子click
+    function qzClick(e){
+        e.stopPropagation();
+        pointHide();
+        moveQz = this;
+        var p = this.obj;
+        p.move();
+        for(var i in p.stayArr){
+            var l = p.stayArr[i];
+            points[l.y][l.x].style.display = "block";
+        }
+        document.body.onclick = function(){
+            pointHide();
+            document.body.onclick = null;
+        }
+    }
+    //走棋
+    function qzTo(e){
+        e.stopPropagation();
+        var over = false;
+        var x = parseInt(this.x);
+        var y = parseInt(this.y);
+        if(chessArr[y][x] && chessArr[y][x].type == 6){
+            over = true;
+            setTimeout(function(){
+                alert(chessArr[y][x].red?"红方胜":"黑方胜");
+            },350);
+        }
+        chessArr[moveQz.obj.y][moveQz.obj.x] = 0;
+        qzDom[moveQz.obj.y][moveQz.obj.x] = 0;
+        moveQz.style.left = x * rectLen + 20 + "px";
+        moveQz.style.top = y * rectLen + 20 + "px";
+        moveQz.obj.x = x;
+        moveQz.obj.y = y;
+        if(qzDom[moveQz.obj.y][moveQz.obj.x]){
+            qzDom[moveQz.obj.y][moveQz.obj.x].style.display = "none";
+            qzDom[moveQz.obj.y][moveQz.obj.x].obj.hide = true;
+            qzDom[moveQz.obj.y][moveQz.obj.x] = moveQz;
+        }
+        chessArr[moveQz.obj.y][moveQz.obj.x] = moveQz.obj;
+        qzDom[moveQz.obj.y][moveQz.obj.x] = moveQz;
+        pointHide();
+        if(jj(moveQz.obj.red)){
+            message("将军");
+        }
+        if(!over){
+            //切换先手方
+            start = (start==="red"?"black":"red");
+            //添加click
+            for(var d in document.getElementsByClassName(start)){
+                document.getElementsByClassName(start)[d].onclick = qzClick;
+            }
+        }
+        //click
+        for(var c in document.getElementsByClassName(start==="red"?"black":"red")){
+            document.getElementsByClassName(start==="red"?"black":"red")[c].onclick = function(){
+                message("现在轮到" + (start==="red"?"红方":"黑方") + "行动");
+            };
+        }
+    }
+    //隐藏落点
+    function pointHide(){
+        for(var i in points){
+            for(var j in points[i]){
+                points[i][j].style.display = "none";
+            }
+        }
+    }
+    //翻转
+    function fanzhuan(){
+        chessArr.reverse();
+        qzDom.reverse();
+        for(var i in chessArr){
+            chessArr[i].reverse();
+            qzDom[i].reverse();
+            for(var j in chessArr[i]){
+                chessArr[i][j].dir = Number(!Boolean(chessArr[i][j].dir));
+                chessArr[i][j].x = Number(j);
+                chessArr[i][j].y = Number(i);
+            }
+        }
+        reAddQz();
+    }
+    //重新放置棋子
+    function reAddQz(){
+        for(var i in qzDom){
+            for(var j in qzDom[i]){
+                if(!qzDom[i][j]){continue;}
+                qzDom[i][j].style.left = j * rectLen + 20 + "px";
+                qzDom[i][j].style.top = i * rectLen + 20 + "px";
+            }
+        }
+    }
+    //判断是否将死
+    function godie(b){}
+    //判断将军
+    function jj(b){
+        for(var i in chessArr){
+            for(var j in chessArr[i]){
+                var obj = chessArr[i][j];
+                if(obj==0 || obj.red!=b){continue;}
+                obj.move();
+                for(var k in obj.stayArr){
+                    var to = obj.stayArr[k];
+                    if(chessArr[to.y][to.x] && chessArr[to.y][to.x].type == 6){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    //提示
+    function message(str){
+        var d = document.createElement("div");
+        d.setAttribute("class","message");
+        d.innerHTML = str;
+        document.body.appendChild(d);
+        setTimeout(function(){
+            document.body.removeChild(d);
+        },1500);
+    }
+</script>
+</body>
+</html>

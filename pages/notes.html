@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>反身而诚-留言</title>
+    <meta name="keywords" content="反身而诚,js小游戏,相册留言">
+    <meta name="description" content="反身而诚的个人空间网站，有js小游戏和相册和留言模块">
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/live2d.css"/>
+    <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/>
+    <style>
+        #bgcanvas{background: url('../src/public/public/bg-mj.jpg') repeat;background-size:cover;}
+        .blur {
+            position:absolute;
+            top:0;left:0;right:0;bottom:0;
+            z-index:-1;
+            background:url('../src/public/public/bg-w.jpg') repeat center center;
+			background-size:100% 100%;
+            opacity:0.8;
+        }
+        #content .cont .box{position:absolute;width:980px;margin-left:-490px;left:50%;top:0;bottom:225px;overflow-y:auto;color:#ffffff;}
+        #listbox{position:relative;overflow:hidden!important;}
+        #listbox .my-tab{position:absolute;box-sizing:border-box;width:235px;height:235px;user-select: none;}
+        #listbox .my-tab:hover{cursor:move;}
+        #listbox .my-tab .delete{display:none; position:absolute; right:-5px; top:10px; background:#333333; width:30px; height:30px; border-radius:50%; text-align:center; line-height:30px; color:#ffffff; cursor:pointer;}
+        #listbox .my-tab .delete.show{display:block;}
+        #listbox .my-tab .bg-top{height:68px;background:url("../src/notes/tab/c1-1.gif");}
+        #listbox .my-tab .bg-cont{height:110px;padding-left:20px;padding-right:5px;background: url("../src/notes/tab/c1-2.gif") repeat-y -2px 0;color:#333;font-family:"SimSun","宋体";}
+        #listbox .my-tab .bg-cont .word{padding-top:10px;margin-bottom:-20px;height:100px;line-height:18px; overflow:auto; white-space: pre-wrap;}
+        /* #listbox .my-tab .bg-cont .word::-webkit-scrollbar {display:none} */
+        #listbox .my-tab .bg-btm{box-sizing:border-box;height:72px;padding:40px 10px 0 20px;background:url("../src/notes/tab/c1-3.gif");font-size:14px;text-align:right;color:#333;}
+        #listbox .my-tab .bg-cont .tab-title{height:30px;line-height:30px;margin-top:-16px;overflow:hidden;}
+        #listbox .my-tab .icon{display:inline-block;width:30px;height:30px;background:url("../src/notes/icon.jpg");border-radius:50%;background-size:180px 180px;}
+        #listbox .my-tab .icon.me{background:url("../src/notes/me.jpg") no-repeat!important;background-size:100% 100%!important;}
+        #listbox .my-tab .name{font-size:16px;margin-left:10px;}
+        #listbox .my-tab .id{font-size:12px;padding-right:5px;}
+        /*  style 1  */
+        #listbox .my-tab.style1 .bg-top{background-image:url("../src/notes/tab/c1-1.gif");}
+        #listbox .my-tab.style1 .bg-cont{background-image:url("../src/notes/tab/c1-2.gif");}
+        #listbox .my-tab.style1 .bg-btm{background-image:url("../src/notes/tab/c1-3.gif");}
+        /*  style 2  */
+        #listbox .my-tab.style2 .bg-top{background-image:url("../src/notes/tab/c2-1.gif");}
+        #listbox .my-tab.style2 .bg-cont{background-image:url("../src/notes/tab/c2-2.gif");}
+        #listbox .my-tab.style2 .bg-btm{background-image:url("../src/notes/tab/c2-3.gif");}
+        /*  style 3  */
+        #listbox .my-tab.style3 .bg-top{background-image:url("../src/notes/tab/c3-1.gif");}
+        #listbox .my-tab.style3 .bg-cont{background-image:url("../src/notes/tab/c3-2.gif");}
+        #listbox .my-tab.style3 .bg-btm{background-image:url("../src/notes/tab/c3-3.gif");}
+        /*  style 4  */
+        #listbox .my-tab.style4 .bg-top{background-image:url("../src/notes/tab/c4-1.gif");}
+        #listbox .my-tab.style4 .bg-cont{background-image:url("../src/notes/tab/c4-2.gif");}
+        #listbox .my-tab.style4 .bg-btm{background-image:url("../src/notes/tab/c4-3.gif");}
+        /*  style 5  */
+        #listbox .my-tab.style5 .bg-top{background-image:url("../src/notes/tab/c5-1.gif");}
+        #listbox .my-tab.style5 .bg-cont{background-image:url("../src/notes/tab/c5-2.gif");}
+        #listbox .my-tab.style5 .bg-btm{background-image:url("../src/notes/tab/c5-3.gif");}
+        /*  style 6  */
+        #listbox .my-tab.style6 .bg-top{background-image:url("../src/notes/tab/c6-1.gif");}
+        #listbox .my-tab.style6 .bg-cont{background-image:url("../src/notes/tab/c6-2.gif");}
+        #listbox .my-tab.style6 .bg-btm{background-image:url("../src/notes/tab/c6-3.gif");}
+        /*  style 7  */
+        #listbox .my-tab.style7 .bg-top{background-image:url("../src/notes/tab/c7-1.gif");}
+        #listbox .my-tab.style7 .bg-cont{background-image:url("../src/notes/tab/c7-2.gif");}
+        #listbox .my-tab.style7 .bg-btm{background-image:url("../src/notes/tab/c7-3.gif");}
+        /*  style 8  */
+        #listbox .my-tab.style8 .bg-top{background-image:url("../src/notes/tab/c8-1.gif");}
+        #listbox .my-tab.style8 .bg-cont{background-image:url("../src/notes/tab/c8-2.gif");}
+        #listbox .my-tab.style8 .bg-btm{background-image:url("../src/notes/tab/c8-3.gif");}
+
+        #content .cont .pages{position:absolute;width:100%;height:30px;text-align:center;bottom:195px;user-select: none;font-family:"Microsoft YaHei","SimSun","Arial Narrow","HELVETICA";}
+        #content .cont .pages a{line-height: 30px;margin: 0 8px;background: #ffffff;padding: 5px 12px;cursor:pointer;vertical-align: middle;}
+        #content .cont .pages a:hover{outline:2px solid #ffffff;}
+        #content .cont .pages .active{background:#000000;color:#ffffff;}
+        #content .cont .pages span{line-height:30px;padding: 5px 12px;cursor: pointer;vertical-align: middle;font-size:12px;color: #ffffff;}
+        #content .cont .loading{opacity:0.5;}
+        #form{position:absolute;left:50%;bottom:0;width:980px;height:185px;margin:0 0 10px -490px;font-size:0;-webkit-text-size-adjust:none;}
+        #form .length{color:#ffbbbb;position:absolute;right:22px;bottom:50px;font-size:18px;line-height:30px;}
+
+        #text{width:960px;height:115px;padding:10px;font-size:18px;line-height:135%;border:none;resize: none;outline:none;background: rgba(0,0,0,0.2);color:#ffffff;overflow-x:hidden;overflow-y:scroll;}
+        #text::-webkit-input-placeholder{color:#cccccc;}
+        #text::-moz-placeholder{color:#cccccc;}
+        #text:-moz-placeholder{color:#cccccc;}
+        #text:-ms-input-placeholder{color:#cccccc;}
+
+        #form label{display:block;position:relative;width:100%;height:50px;background:#fcfcfc;}
+        #name{width:700px;height:40px;padding:0;margin:5px 5px 5px 20px;border:0;outline:0;font-size:18px;line-height:40px;}
+        #name:focus{outline:none;border:0;padding:0;}
+        @media only screen and (min-width: 1400px) {#content .cont .box{width:1200px;margin-left:-600px;} #form{width:1200px;margin-left:-600px;} #text{width:1180px;} #name{width:1000px;}}
+        #submit{position:absolute;right:0;top:0;border:none;margin:0;padding:0;width:120px;height:100%;background:#007aff;color:#ffffff;outline:none;cursor:pointer;font-size:16px;}
+        #submit:hover{font-size:18px;}
+        #form .submit_disabled{background:#cccccc;}
+        #form .icon{float:left;width:50px;height:50px;border-radius:25px;background:#000000 url("../src/notes/icon.jpg") no-repeat 0 0;cursor:pointer;}
+        #form .iconbox{display:none;position:absolute;bottom:100%;z-index:30;width:450px;height:200px;padding:1px;border:1px solid #000000;overflow:hidden;}
+        #form .iconbox .iconselect{position:relative;width:50px;height:50px;float:left;margin:0;padding:0;border:0;background:url("../src/notes/icon.jpg");opacity:0.9;filter:alpha(opacity=90);}
+        #form .iconbox .iconselect:hover{outline:2px solid #007aff;z-index:40;opacity:1;filter:alpha(opacity=100);}
+        #form .iconbox .active{opacity:1;filter:alpha(opacity=100);}
+        #form .iconbox .select{position:absolute;top:0;left:0;z-index:50;width:50px;height:50px;outline:2px dotted #ff0000;color:#ff0000;font-size:30px;text-align:center;line-height:50px;cursor:default}
+        #form .iconbox .select{
+            transition:left 0.3s,top 0.3s;
+            -webkit-transition:left 0.3s,top 0.3s;
+            -moz-transition:left 0.3s,top 0.3s;
+            -o-transition:left 0.3s,top 0.3s;
+            -ms-transition:left 0.3s,top 0.3s;}
+        #form .style{float:left;width:30px;height:24px;margin:13px 10px;outline:1px solid #000000;background:#f0f0f0;cursor:pointer;}
+        #form .stylebox{display:none;position:absolute;bottom:100%;left:50px;z-index:30;width:60px;border:1px solid #000;background:#fff;}
+        #form .stylebox .item{border-top:1px solid transparent;border-bottom:1px solid transparent;height:30px;}
+        #form .stylebox .item:hover{border-color:#000;}
+    </style>
+</head>
+<body>
+<div id="header">
+    <img src="../src/public/public/head-l.png" class="bg-l"/>
+    <img src="../src/public/public/head-r.png" class="bg-r"/>
+    <img src="../src/public/public/head-t.png" class="bg-t"/>
+    <div class="profile">
+        <div class="box">
+            <div class="rect rect_1"><img _src="../src/public/headerbox/1.jpg"/></div>
+            <div class="rect rect_2"><img _src="../src/public/headerbox/2.jpg"/></div>
+            <div class="rect rect_3"><img _src="../src/public/headerbox/3.jpg"/></div>
+            <div class="rect rect_4"><img _src="../src/public/headerbox/4.jpg"/></div>
+            <div class="rect rect_5"><img _src="../src/public/headerbox/5.jpg"/></div>
+            <div class="rect rect_6"><img _src="../src/public/headerbox/6.jpg"/></div>
+        </div>
+        <div class="spliteBall_up"></div>
+        <div class="spliteBall_down"></div>
+    </div>
+    <div class="menu">
+        <!-- <a href="/"><span>滥觞</span></a> -->
+        <a href="/album"><span>相册</span></a>
+        <a class="active" href="/notes"><span>树洞</span></a>
+    </div>
+    <div class="showphoto">
+        <img src="../src/public/headerbox/1.jpg"/>
+    </div>
+</div>
+<div id="content">
+    <canvas id="bgcanvas" class="bg_canvas"></canvas>
+    <div class="bg_points"></div>
+    <div class="cont">
+        <!--正文-->
+        <div class="box"  id="listbox">
+            <div class="blur"></div>
+            <div class='none'>Loading...</div>
+        </div>
+        <div id="pages" class="pages"></div>
+        <form id="form" method="post" action="../word.php">
+            <span class="length"><i class="nowleng"> 0 </i>/<i> 500 </i></span>
+            <textarea id="text" name="text" placeholder="光标闪闪抒想法，键盘声声送评论，这，就是对作者最大的鼓励！" maxlength="500"></textarea>
+            <label>
+                <div class="iconbox"></div>
+                <div class="stylebox"></div>
+                <span class="icon"></span>
+                <span class="style"></span>
+                <input id="name" autocomplete="off" name="name" value="游客N" placeholder="这里输入您的名称，长度小于10" type="text" maxlength="10" />
+
+                <input id="submit" type="submit" value="发  送" />
+            </label>
+            <input class="iconid" type="hidden" name="icon" value="0" />
+            <input class="styleid" type="hidden" name="style" value="1" />
+        </form>
+    </div>
+    <div id="landlord">
+        <!--地板--<div class="ground"></div>-->
+        <div class="message" style="display:none;"></div>
+        <canvas id="live2d" width="200" height="300"  class="live2d"></canvas>
+        <div id="chat" style="display:none;">
+            <span class="iconfont icon-enter enter"></span>
+            <input class="txt" type="text" placeholder="快来和我聊天吧"/>
+            <input class="btn" type="button" value="ok"/>
+        </div>
+    </div>
+</div>
+<audio id="bgm" autoplay></audio>
+<script src="../js/jquery-1.12.4.min.js" type="text/javascript"></script>
+<script src="../js/main.js" type="text/javascript"></script>
+<script>
+var removeUrl = "";
+var key = "";
+
+$(function(){
+    icon();
+    styleSelect();
+    setname();
+    notes();
+    bgBrid();
+    setEvent();
+});
+
+function notes(){
+    var zindex = 1;
+    var setPageLen = 16;
+    var activePage = 0;
+    var listbox = $("#listbox");
+    var randomX = listbox.width()-235;
+    var randomY = listbox.height()-235;
+    getData(0,function(){$("#listbox .none").remove();});
+    //获取留言
+    function getData(getpage,callback){
+        if(!getpage){getpage=0;}
+        $.ajax({
+            url:"word.php",
+            //url:"testnode.json",
+            type:"post",
+            timeout:5000,
+            data:{"get":true,page:getpage,limit:setPageLen},
+            dataType:"json",
+            success:function(message){
+                var data = message.arr;
+                var listbox = $("#listbox");
+                listbox.find(".my-tab").remove();
+                if(!data||data.length==0){listbox.html("<div class='none'>暂无留言</div>")}
+                for(var i=0;i<data.length;i++){
+                    var d = data[i];
+                    d.icon = Number(d.icon);
+                    // d.text = d.text.replace(/\n/g,"<br/>");
+                    // d.text = d.text.replace(/\s/g,"&nbsp;&nbsp;");
+                    var tab = $("<div class='my-tab style"+(d&&d.style)+"'>" +
+                                "<div myid='"+d.index+"' class='delete "+(removeUrl?'show':'')+"'>&times;</div>"+
+                                "<div class='bg-top'></div> " +
+                                "<div class='bg-cont'>" +
+                                    "<div class='tab-title'>" +
+                                        "<i class='icon fl' iconid='"+ d.icon+"' />" +
+                                        "<span class=\"name fl\">"+d.name+"</span>"+
+                                        "<span class=\"id fr\">"+d.id+"F</span>"+
+                                    "</div>"+
+                                    "<p class=\"word\">"+d.text+"</p>" +
+                                "</div>" +
+                                "<div class='bg-btm'>" +
+                                    "<div class='date'>"+d.date+"</div>"+
+                                "</div> " +
+                            "</div>");
+                    if (d.icon == 99) {
+                        tab.find(".icon").addClass("me").attr("title","反身而诚专属头像");
+                    }else{
+                        var px = parseInt(d.icon % 6) * 30;
+                        var py = parseInt(d.icon / 6) * 30;
+                        tab.find(".icon").css({backgroundPositionX: -px + "px", backgroundPositionY: -py + "px"})
+                    }
+                    var x = Math.random() * randomX;
+                    var y = Math.random() * randomY;
+                    tab.css({left:x+"px",top:y+"px",zIndex:++zindex});
+                    addtouchevent(tab);
+                    listbox.append(tab);
+                }
+
+                $("#pages").html("");
+                setPageButton(activePage,message.pages,message.len);
+                if(callback){callback(true)}
+            },
+            error:function(error){
+                Mask("获取留言失败 ("+error.status+")");
+                if(callback){callback(false)}
+            }
+        });
+    }
+    //便签添加移动事件
+    function addtouchevent(obj){
+        obj.mousedown(function(event){
+            this.style.zIndex = ++zindex;
+            var offsetX = event.clientX-obj.offset().left;
+            var offsetY = event.clientY-obj.offset().top;
+            var ts = $(this);
+            content.mousemove(function(event){
+                var left = event.clientX - listbox.offset().left - offsetX;
+                var top = event.clientY - listbox.offset().top - offsetY;
+                ts.css({left:ts.css({left:left+"px",top:top+"px"})});
+            });
+            obj.mouseup(function(){
+                content.off("mousemove");
+            })
+        });
+    }
+    //设置分页按钮
+    function setPageButton(page,pages,len){
+        if(len<=setPageLen){return}
+        var pageDom = $("#pages");
+        if(pages<10){
+            for(var i=0;i<pages;i++){
+                pageDom.append("<a "+(i==page?"class='active'":"")+" goto='"+i+"'>"+(i+1)+"</a>");
+            }
+        }else{
+            if(page+3>=pages){
+                for(var i=0;i<7;i++){
+                    pageDom.append("<a "+(page==(pages-7+i)?"class='active'":"")+" goto='"+(pages-7+i)+"'>"+(pages-6+i)+"</a>");
+                }
+            }else{
+                var b = 7;
+                for(var i=0;i<b;i++){
+                    if(page-3+i<=0){b++;continue;}
+                    pageDom.append("<a "+(i==4?"class='active'":"")+" goto='"+(page-4+i)+"'>"+(page-3+i)+"</a>");
+                }
+            }
+        }
+        pageDom.append("<span>共 "+pages+" 页， "+len+" 条</span>").find("a.active");
+    }
+
+    $("#pages").click(pagesClick);
+
+    function pagesClick(){
+        var target = $(event.target);
+        if(target.is("a")){
+            activePage = parseInt(target.attr("goto"));
+            var n = activePage * setPageLen;
+            var ts = $(this);
+            ts.addClass("loading").unbind();
+            getData(n,function(b){
+                ts.removeClass("loading").click(pagesClick);
+            });
+        }
+    }
+
+    $("#text").bind("input propertychange",function(){
+        $("#form .length .nowleng").html(" "+$(this).val().length+" ");
+    });
+    $("#name").focus(function(){$(this).select();});
+    //提交
+    $("#form").submit(function(){
+        $("#submit").attr("disabled","true").addClass("submit_disabled");
+
+        var form = $(this);
+        var name = $("#name").blur().val();
+        var text = $("#text").blur().val();
+
+        var pd = [
+            [text.length==0,"请输入留言内容","#text"],
+            [text.length>500,"留言长度请小于500","#text"],
+            [name.length==0,"请输入您的名称","#name"],
+            [name.length>10,"名称过长","#name"]
+        ];
+        for(var i=0;i<pd.length;i++){
+            if(pd[i][0]){
+                Mask(pd[i][1],false,function(){
+                    $(pd[i][2]).select().focus();
+                });
+                btnaction();return false;
+            }
+        }
+
+        var cookieDate = new Date();
+        cookieDate.setDate(cookieDate.getDate()+300);
+        document.cookie = "username="+name+";expires="+cookieDate.toGMTString();
+        var data = $("#form").serialize();
+        if(name=="反身而诚"){data+= "&me="+prompt("本人专用名称，请验证");}
+        $.ajax({
+            url:"word.php",
+            type:"post",
+            data:data,
+            dataType:"json",
+            success:function(data){
+                Mask(data.cont,false,function(){
+                    getData(activePage * setPageLen);
+                });
+                btnaction();
+                $("#text").val("");
+                $("#form .length .nowleng").html(" 0 ");
+            },
+            error:function(error){
+                Mask("提交失败:"+error.status);
+                btnaction();
+            }
+        });
+
+        function btnaction(){
+            //$("#submit").attr("disabled","true");
+            $("#submit").prop("disabled",false).removeClass("submit_disabled");
+        }
+        return false;
+    });
+
+    //IE文本框模仿placeholder属性
+    if(document.all){
+        (function($){
+            $.fn.placeholder = function(options){
+                var opts = $.extend({}, $.fn.placeholder.defaults, options);
+                var isIE = document.all ? true : false;
+                return this.each(function(){
+                    var _this = this,
+                        placeholderValue =_this.getAttribute("placeholder"); //缓存默认的placeholder值
+                    if(isIE){
+                        _this.setAttribute("value",placeholderValue);
+                        _this.onfocus = function(){
+                            $.trim(_this.value) == placeholderValue ? _this.value = "" : '';
+                        };
+                        _this.onblur = function(){
+                            $.trim(_this.value) == "" ? _this.value = placeholderValue : '';
+                        };
+                    }
+                });
+            };
+        })(jQuery);
+        $("#name").placeholder();
+    }
+
+    //content大小
+    win.resize(function(){
+        content.children(".cont").children(".box").css({height:$(this).height()-102-225+"px"});
+    }).resize();
+
+}
+//选择颜色
+function styleSelect(){
+    var color = ["#f0f0f0","#ffdeff","#ffcccc","#ffe3b8","#ffffcc","#c5ffc2","#ceecff","#e8ddff"];
+    var styleBox = $("#form .stylebox");
+    var stylebtn = $("#form .style");
+    var input = $("#form .styleid");
+    for(var i in color){
+        var item = $("<div class='item' index='"+i+"' style='background: "+color[i]+"'></div>");
+        item.click(function(){
+            stylebtn.css("background",color[$(this).attr("index")]);
+            input.val(Number($(this).attr("index"))+1);
+        });
+        styleBox.append(item);
+    }
+    stylebtn.click(function(){
+        styleBox.show();
+        $("body").one("click",function(){
+            styleBox.hide();
+        });
+        return false;
+    });
+}
+//头像
+function icon() {
+    var w = 6;
+    var h = 6;
+    var l = 50;
+    init();
+    function init(){
+        var iconbox = $("#form .iconbox");
+        var myicon = $("#form .icon");
+        for(var i=0;i<w*h;i++){
+            var px = parseInt(i % w) * l;
+            var py = parseInt(i / h) * l;
+            var icosle = $("<div class='iconselect' style='background-position-x: "+(-px)+"px;background-position-y:"+(-py)+"px;'></div>");
+            iconbox.append(icosle);
+        }
+        iconbox.append("<div class='select'>√</div>");
+        iconbox.click(function(event){
+            var x = event.clientX-iconbox.offset().left-1;
+            var y = event.clientY-iconbox.offset().top-1;
+            var id = parseInt(y/l)*9 + parseInt(x/l);
+            icon.set(id);
+            return false;
+        });
+        myicon.click(function(){
+            if(iconbox.is(":visible")){
+                iconbox.hide();
+                $("body").unbind();
+                return false
+            }
+            iconbox.show();
+            $("body").one("click",function(){iconbox.hide()});
+            return false;
+        });
+    }
+    icon.set = function (id) {
+        //if (id == 99) {return false;}
+        id = parseInt(id);
+        var px = parseInt(id % w) * l;
+        var py = parseInt(id / h) * l;
+        $("#form .icon").css({backgroundPositionX: -px + "px", backgroundPositionY: -py + "px"});
+        var sx = parseInt(id%9)*l+1;
+        var sy = parseInt(id/9)*l+1;
+        $(".select").css({left:sx+"px",top:sy+"px"});
+        $("#content .iconid").val(id);
+
+        var cookieDate = new Date();
+        cookieDate.setDate(cookieDate.getDate()+300);
+        document.cookie = "usericon="+id+";expires="+cookieDate.toGMTString();
+    };
+    if(getCookie("usericon")){icon.set(getCookie("usericon"));}
+}
+//名称cookie
+function setname(){
+    var name = getCookie("username");
+    if(name){$("#name").val(name);}
+}
+function setEvent(){
+    $(document.body).on("keyup",function(event){
+        if(event && event.keyCode && event.keyCode=="82"){
+            if($("#text").is(":focus") || $("#name").is(":focus")){return};
+            key = prompt("口令：");
+            if(key==""){return}
+        }else{return}
+        $.ajax({
+            url: "../phps/getRmnoteUrl.php",
+            type: "post",
+            dataType: "json",
+            data: {key:key},
+            success(data){
+                if(data.code!=0){alert(data.msg);return}
+                removeUrl = data.url;
+                $("#listbox .delete").addClass("show");
+            }
+        });
+    });
+    $("#listbox").on("click",".delete",function(){
+        if(!confirm("确定删除该留言？")){return}
+        var ts = $(this);
+        var id = ts.attr("myid");
+        $.ajax({
+            url: removeUrl,
+            type: "post",
+            data: {id:id, key:key},
+            dataType: "json",
+            success(data){
+                if(data.code!=0){alert(data.msg);return}
+                alert("删除成功");
+                ts.parnets(".my-tab").remove();
+            }
+        });
+    })
+}
+
+</script>
+<script src="../src/public/live2d/live2d.js"></script>
+<script src="../src/public/live2d/setLive2.js"></script>
+<script src="../src/public/myplayer/myplayer.js"></script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1273638543'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273638543%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+</body>
+</html>

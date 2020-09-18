@@ -1,0 +1,456 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>反身而诚-Three.js</title>
+<meta name="keywords" content="反身而诚,js小游戏">
+<style type="text/css">
+    body {margin: 0;font-size:16px;line-height:100%;cursor:move;}
+    canvas{display:block;}
+    .js{position:absolute;top:20px;left:20px;border:2px solid #ff0000;outline:4px solid rgba(0,0,0,0.5);padding:20px;color:#ffffff;z-index:9;line-height:2;background:rgba(0,0,0,0.5);}
+    .js span{line-height:20px;}
+    .center{position:absolute;top:20%;left:50%;margin-left:-150px;width:300px;padding:20px 0;border:2px solid;outline:10px solid rgba(0,0,0,0.8);color:#ffffff;z-index:9;line-height:2;background:rgba(0,0,0,0.8);text-align:center;}
+    .oh{height:12px;overflow:hidden;}
+    .pointer{padding:0 4px;font-size:20px;vertical-align:text-top;cursor:pointer;}
+    #button:hover{color:#007aff;}
+    #full:hover{color:#007aff;}
+
+    @font-face {font-family: "iconfont";
+        src: url('iconfont.eot?t=1533795638771'); /* IE9*/
+        src: url('iconfont.eot?t=1533795638771#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('data:application/x-font-woff;charset=utf-8;base64,d09GRgABAAAAAAXMAAsAAAAACLAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABHU1VCAAABCAAAADMAAABCsP6z7U9TLzIAAAE8AAAARAAAAFZW7klyY21hcAAAAYAAAABnAAABnNB0bs5nbHlmAAAB6AAAAdYAAAJk7VFms2hlYWQAAAPAAAAALwAAADYSQ0BjaGhlYQAAA/AAAAAcAAAAJAfeA4VobXR4AAAEDAAAABAAAAAQD+kAAGxvY2EAAAQcAAAACgAAAAoBqAD0bWF4cAAABCgAAAAfAAAAIAETAGhuYW1lAAAESAAAAUUAAAJtPlT+fXBvc3QAAAWQAAAAPAAAAFDsdRl/eJxjYGRgYOBikGPQYWB0cfMJYeBgYGGAAJAMY05meiJQDMoDyrGAaQ4gZoOIAgCKIwNPAHicY2Bk/sU4gYGVgYOpk+kMAwNDP4RmfM1gxMjBwMDEwMrMgBUEpLmmMDgwVDxvY27438AQw9zA0AAUZgTJAQAuCAz1eJxjYGBgZWBgYAZiHSBmYWBgzGBgZACBJKAoI1icmYELLM7CYAbkcwAhE5CueGb5vO3/fxQWCDCCVXCAWcwglYxsDAMGGAfOalTAAyZNoDxQeFdAMdCJzywhGCT+vA2CGZgABMcScwB4nF2QT2sTQRjG553ZP9mY7JrZv9lkk+xss6vUbHG7NkgwUfCgUpoa6aF68gO019LioQiCBxFP7V0EDx5LbwU9Blv8AN5EPfoFSonOlHjZYXh55n2fh5nfIBmhvz/ICfGQia6hm+g+WkcIlEVgOg4gTPIUL4IdyrZr6SSJklCNWErugMsUy8lW8thVVMUAHVqwHGYrSYoTuJUP8QAyJwCoN/wntNuk5B2UvaT1avYIvwe7HTWNYW/28MbIyjpmaadCaZ3SNyVFlksYS4YOW66jyVpZmX2QDd8+aV/HbajUE391s9pp0Oev8+2g62oA+/tgNjr6x1HNr/H9wndMWlevVkueX40WLNj5dcUzK0H8E/ElcdbP5CUB5KAeJ32GkGkLCo4jWJZgWRBx9jASeANQBeQI5qb4/7zPKzM4Z8yUAJzuXCS8Wm2YZ7O7tElPy56pnR3rlOrnXdI4F+L4TDO98imfwsXvYofcK6bw94KnYIgvvhQ7cSHB2YGzfyXfyAAt8EPK3xrZLXB1ULnO+y5RXcW23Jb4if5QEJJPbHc8eXo4laTpAa+1x/KfDZ+xvbXJ0WS8yxhO1/YY25CmhweXntt5D6y3Sw/Gm5djJuJH/Op/fdl1BQAAeJxjYGRgYABi5f37NeL5bb4ycLMwgMD1if/MEPT//SwMzNZALgcDE0gUADKFCrwAeJxjYGRgYG7438AQw8IAAkCSkQEVsAAARwoCbQQAAAAD6QAABAAAAAQAAAAAAAAAAHYA9AEyAAB4nGNgZGBgYGGIYWBlAAEmIOYCQgaG/2A+AwASJQF8AHicZY9NTsMwEIVf+gekEqqoYIfkBWIBKP0Rq25YVGr3XXTfpk6bKokjx63UA3AejsAJOALcgDvwSCebNpbH37x5Y08A3OAHHo7fLfeRPVwyO3INF7gXrlN/EG6QX4SbaONVuEX9TdjHM6bCbXRheYPXuGL2hHdhDx18CNdwjU/hOvUv4Qb5W7iJO/wKt9Dx6sI+5l5XuI1HL/bHVi+cXqnlQcWhySKTOb+CmV7vkoWt0uqca1vEJlODoF9JU51pW91T7NdD5yIVWZOqCas6SYzKrdnq0AUb5/JRrxeJHoQm5Vhj/rbGAo5xBYUlDowxQhhkiMro6DtVZvSvsUPCXntWPc3ndFsU1P9zhQEC9M9cU7qy0nk6T4E9XxtSdXQrbsuelDSRXs1JErJCXta2VELqATZlV44RelzRiT8oZ0j/AAlabsgAAAB4nGNgYoAALgbsgIWRiZGZkYWRlYGxQqCwNDGvIDMvvao0MyUxozSRP6esKiO/NB5IAAUzMhkYABAgDfE=') format('woff'),
+        url('iconfont.ttf?t=1533795638771') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+        url('iconfont.svg?t=1533795638771#iconfont') format('svg'); /* iOS 4.1- */
+    }
+    .iconfont {
+        font-family:"iconfont" !important;
+        font-size:16px;
+        font-style:normal;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    .icon-full:before { content: "\e786"; }
+    .icon-reset:before { content: "\e639"; }
+</style>
+<script>
+    //检测是否支持 webgl
+    function detectWebGLContext () {
+        var canvas = document.createElement("canvas");
+        if(!canvas.getContext){return false;}
+        var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        if (gl && gl instanceof WebGLRenderingContext) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    if(window.parent.lowIE){
+        alert("您的浏览器不支持canvas,请升级浏览器，建议使用谷歌浏览器");
+        window.parent.document.querySelector(".mask>.addClose").click();
+    }else if(!detectWebGLContext()){
+        alert("您的浏览器不支持webgl,请升级浏览器，建议使用谷歌浏览器");
+        if(window.stop){window.stop();}
+        window.parent.document.querySelector(".mask>.addClose").click();
+    }
+</script>
+</head>
+<body>
+<div class="js">
+    <span>左键：旋转</span><br/>
+    <span>滚轮：缩放</span><br/>
+    <span>右键：拖拽</span><br/>
+    <span>视角：<i id="button" class="pointer iconfont icon-reset"></i></span><br/>
+    <span>全屏：<i id="full" class="pointer iconfont icon-full"></i></span>
+</div>
+<div id="loading" class="center">模型文件7M 略大,正在玩命加载...</div>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="STLLoader.js"></script>
+<script type="text/javascript">
+
+    //创建场景
+    var scene = new THREE.Scene();
+
+    //创建相机（视角，长宽比，最近距离，最远距离）
+    var camera = new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,5000);
+    camera.position.x = 200;
+    camera.position.y = 200;
+    camera.position.z = 200;
+    camera.lookAt(new THREE.Vector3(0,0,0));
+
+    //创建渲染器
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    //启用阴影
+    renderer.shadowMap.enabled = true;
+    //添加canvas
+    document.body.appendChild(renderer.domElement);
+
+    //添加一个坐标轴
+    // var axes=new THREE.AxisHelper(100);
+    // scene.add(axes);
+
+    /*
+    *光源大概有7种，
+    * 其中基础光源有4种
+    *   环境光（AmbientLight 会它的颜色会添加到整个场景和所有对象的当前颜色上），
+    * 　点光源（PointLight空间中的一点，朝所有的方向发射光线），
+    * 　聚光灯光源（SpotLight这种光源有聚光的效果，类似于台灯，吊灯，手电筒），
+    * 　方向光（DirectionalLight也称无限光，从这种光源发出的光线可以看作是平行的，例如太阳光）
+    * 特殊光源有3种
+    *   半球光光源（HemisphereLight，可以为室内场景创建更加自然的光照效果，模拟反光面和光线微弱的天气）
+    * 　面光源（AreaLight使用这种光源可以指定散发光线的平面，而不是空间的一个点）
+    * 　镜头炫光（LensFlare这不是一种光源，但是通过该炫光可以为场景中的光源添加炫目的效果）
+    * */
+    // 添加光源
+    light();
+    function light(){
+        var allLight = new THREE.AmbientLight(0x333333);
+        scene.add(allLight);
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(80,300,80);
+        //告诉光源需要投射阴影
+        spotLight.castShadow = true;
+        //设置阴影分辨率
+        spotLight.shadow.mapSize.width = 2048;
+        spotLight.shadow.mapSize.height = 2048;
+        scene.add(spotLight);
+    }
+
+    /*
+    ******* 立方体 *********
+    * BoxGeometry(width, height, dept, widthSegments, heightSegments, depthSegments)
+    * - width,height,dept分别是长宽高
+    *-widthSegments, heightSegments, deptSegments是对应长宽高的分段
+    *
+    * ***** 球 体 *********
+    * SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
+    * - radius：球体半径
+    * - widthSegments, heightSegments：水平方向和垂直方向上分段数。widthSegments最小值为3，默认值为8。heightSegments最小值为2，默认值为6。
+    * - phiStart：水平方向上的起始角,默认值0
+    * - phiLenght：水平方向上球体曲面覆盖的弧度，默认Math.PI * 2
+    * - thetaStart : 垂直方向上的起始角， 默认0
+    * - thetaLength: 垂直方向是球体曲面覆盖的弧度，默认值为Math.PI
+    * */
+
+    /*
+    *
+    * 常用的三种材质：
+    * MeshBasicMaterial：对光照无感，给几何体一种简单的颜色或显示线框(显示线框：wireframe:true)
+    * MeshLambertMaterial：这种材质对光照有反应，用于创建暗淡的不发光的物体
+    * MeshPhongMaterial：这种材质对光照也有反应，用于创建金属类明亮的物体
+    *
+    * */
+
+    var earth;
+
+    box();
+    function box(){
+        ball = new THREE.SphereGeometry(40,50,50);
+        var boxTexture = new THREE.ImageUtils.loadTexture("img/diffuse.jpg");
+        var cubeMaterial = new THREE.MeshPhongMaterial( {map:boxTexture} );
+        var cube = new THREE.Mesh( ball, cubeMaterial );//创建网格
+        cube.castShadow = true;//让物体投射阴影
+        cube.position.y = 0;
+        scene.add( cube );
+        earth = cube;
+    }
+
+    /*
+    * LineBasicMaterial( parameters ) Parameters是一个定义材质外观的对象，它包含多个属性来定义材质，这些属性是：
+    *   Color：线条的颜色，用16进制来表示，默认的颜色是白色。
+    *   Linewidth：线条的宽度，默认时候1个单位宽度。
+    *   Linecap：线条两端的外观，默认是圆角端点，当线条较粗的时候才看得出效果，如果线条很细，那么你几乎看不出效果了。
+    *   Linejoin：两个线条的连接点处的外观，默认是“round”，表示圆角。
+    *   VertexColors：定义线条材质是否使用顶点颜色，这是一个boolean值。意思是，线条各部分的颜色会根据顶点的颜色来进行插值。
+    *   Fog：定义材质的颜色是否受全局雾效的影响
+    * */
+
+    /*addLine();
+    function addLine(){
+        //画线
+        var material = new THREE.LineBasicMaterial({ color: 0xffffff });
+        var geometry = new THREE.Geometry();
+
+        geometry.vertices.push(new THREE.Vector3( -100, 100, 100) );
+        geometry.vertices.push(new THREE.Vector3( 100, 100, 100) );
+        var line1 = new THREE.Line(geometry,material);
+    }*/
+
+    createplane();
+    function createplane(){
+        //创建二维矩形
+        var planeGeometry=new THREE.PlaneGeometry(300,300);
+        //生成一个材质，设置材质的颜色，同时显示线框
+        var planeMaterial=new THREE.MeshLambertMaterial({color: 0xffffff/*,side:THREE.DoubleSide*/});
+        //生成一个网格，将平面和材质放在一个网格中，组合在一起，组成一个物体
+        var plane=new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.rotation.x = -Math.PI/2;
+        plane.position.y = -50;
+        plane.receiveShadow=true;
+        scene.add(plane);
+    }
+
+    //鼠标控制相机距离旋转，需引入 --- OrbitControls.js
+    var controls;
+    initControls();
+    function initControls() {
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        console.log(controls);
+        // 如果使用animate方法时，将此函数删除
+        //controls.addEventListener( 'change', render );
+        // 使动画循环使用时阻尼或自转 意思是否有惯性
+        controls.enableDamping = true;
+        //动态阻尼系数 就是鼠标拖拽旋转灵敏度
+        //controls.dampingFactor = 0.25;
+        //是否可以缩放
+        controls.enableZoom = true;
+        //是否自动旋转
+        controls.autoRotate = false;
+        //设置相机距离原点的最近距离
+        controls.minDistance = 0;
+        //设置相机距离原点的最远距离
+        controls.maxDistance = 800;
+        //是否开启右键拖拽
+        controls.enablePan = true;
+
+        //重置场景位置,(保存相机和控制器的position，rotation，重新设置)
+        controls.saveCameraPosition = camera.position.clone();
+        controls.saveCameraRotation = camera.rotation.clone();
+        controls.saveCenter = controls.target.clone();
+
+        document.getElementById("button").onclick = function(){
+            camera.position.set(controls.saveCameraPosition.x,controls.saveCameraPosition.y,controls.saveCameraPosition.z);
+            camera.rotation.set(controls.saveCameraRotation.x,controls.saveCameraRotation.y,controls.saveCameraRotation.z);
+            controls.target.set(controls.saveCenter.x,controls.saveCenter.y,controls.saveCenter.z);
+            controls.update();
+        };
+    }
+
+
+    /*
+    * SpriteMaterial()  材质
+    * size:大小
+    * color：PointCloud中所有的粒子的颜色都相同，除非设置了vertexColors且该几何体的colors属性不为空，才会使用colors颜色，否则都使用该属性
+    * map：在粒子上应用某种材质，
+    * sizeAnnutation：false：无论相机的位置，所有的粒子大小一致；，true：离相机近的粒子更大一些，离相机越远越小，
+    * vetexColors	true：且该几何体的colors属性有值，则该粒子会舍弃第一个属性--color，而应用该几何体的colors属性的颜色，
+    * opacity：透明度，
+    * transparent:是否透明，
+    * blending：渲染粒子时的融合模式，
+    * fog：是否受场景的雾化影响
+    * */
+    //THEE.Sprite(精灵)，下雪效果
+    var spriteArr = [];
+    //createSprites();
+    function createSprites() {
+        var texture = (function(){
+            var canvas = document.createElement("canvas");
+            canvas.width = 128;
+            canvas.height = 128;
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#fff";
+            ctx.arc(64,64,64,0,Math.PI*2);
+            ctx.fill();
+            var texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        })();
+        var material = new THREE.SpriteMaterial({map:texture,transparent:true,opacity:0.9});
+        for (var x = 0; x < 300; x++) {
+            var sprite = new THREE.Sprite(material);
+            sprite.position.set(parseInt(Math.random()*200-100),parseInt(Math.random()*200-100),parseInt(Math.random()*200-100));
+            sprite.speedY = Math.random()+0.3;
+            sprite.update = function(){
+                this.position.y -= this.speedY;
+                this.position.x += 0.5;
+                if(this.position.y<=-50){this.position.y = 100;}
+                if(this.position.x>=100){this.position.x = -100;}
+            };
+            spriteArr.push(sprite);
+            scene.add(sprite);
+        }
+    }
+
+    //粒子系统
+    var cloud;
+    //points();
+    function points(){
+        var geom = new THREE.Geometry();
+        var texture = (function(){
+            var canvas = document.createElement("canvas");
+            canvas.width = 128;
+            canvas.height = 128;
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#fff";
+            ctx.arc(64,64,64,0,Math.PI*2);
+            ctx.fill();
+            var texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        })();
+        var mate = new THREE.PointsMaterial({map:texture1,transparent:true});
+        for(var i=0;i<100;i++){
+            geom.vertices.push(new THREE.Vector3(parseInt(Math.random()*200-100),parseInt(Math.random()*200-100),parseInt(Math.random()*200-100)));
+        }
+        cloud = new THREE.Points(geom, mate);
+        cloud.name = "particles";
+        scene.add(cloud);
+    }
+
+
+    /*
+    * 载入模型文件
+    * 载入不同的模型文件需要引入不同的js
+    * */
+    function load(){
+        var texture = (function(){
+            var canvas = document.createElement("canvas");
+            canvas.width = 64;
+            canvas.height = 64;
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#00ccff";
+            ctx.arc(32,32,32,0,Math.PI*2);
+            ctx.fill();
+            var texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        })();
+        //导入资源
+        // 实例化一个加载器
+        var loader = new THREE.STLLoader();
+        //加载一个资源
+        loader.load(
+            // URL
+            //'./Xiangqi.stl',
+            'stl/fly.stl',
+
+            // 资源加载完成后的回调函数
+            function ( object ) {
+
+                document.getElementById("loading").style.display = "none";
+                object.center();
+                object.scale(.5,.5,.5);
+
+                //飞机节点
+                var mate = new THREE.PointsMaterial({map:texture,size:1.2,transparent:true});
+                var points = new THREE.Points(object, mate);
+                points.rotation.x = -Math.PI/2;
+                points.position.y = 150;
+                points.scale.x = 6;
+                points.scale.y = 6;
+                points.scale.z = 6;
+                scene.add(points);
+
+                //飞机线框
+                var wg = new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true});
+                var kj = new THREE.Mesh(object,wg);
+                kj.castShadow = true;
+                kj.rotation.x = -Math.PI/2;
+                kj.position.y = 150;
+                kj.scale.x = 6;
+                kj.scale.y = 6;
+                kj.scale.z = 6;
+                scene.add(kj);
+
+                var material = new THREE.MeshPhongMaterial({ color: 0xffffff});
+                //小飞机
+                var cube = new THREE.Mesh( object, material );
+                cube.rotation.x = -Math.PI/2;
+                cube.rotation.y = -0.5;
+                cube.castShadow = true;
+                cube.receiveShadow=true;
+                cube.position.x = -200;
+                cube.speed = 0.01;
+                cube.position.rotate = Math.PI/2;
+                cube.update = function(){
+                    cube.position.rotate -= 0.01;
+                    //旋转
+                    cube.position.x = Math.sin(cube.position.rotate)*100;
+                    cube.position.z = Math.cos(cube.position.rotate)*100;
+                    //倾斜
+                    cube.rotation.z = cube.position.rotate-(Math.PI/2);
+                    cube.rotation.y = -(Math.sin(cube.position.rotate)/2);
+                    cube.rotation.x = -Math.PI/2-(Math.cos(cube.position.rotate)/2);
+
+                };
+                window.fly = cube;
+                scene.add(cube);
+            }
+        );
+    }
+    load();
+
+    ////side：THREE.FrontSide 模型只正面附着材质，THREE.BackSide 模型只反面附着材质，THREE.DoubleSide 模型双面附着材质
+
+    huanjing();
+    function huanjing(){
+        var boxTexture = new THREE.TextureLoader();
+        boxTexture.load("img/room.jpg",function(texture){
+            //texture.mapping = THREE.UVMapping;
+            var mesh = new THREE.Mesh( new THREE.SphereBufferGeometry( 1500, 50, 50 ), new THREE.MeshBasicMaterial( { map: texture ,side: THREE.BackSide} ) );
+            mesh.scale.x = -1;
+            scene.add(mesh);
+        });
+    }
+
+    other();
+    function other(){
+        //全屏
+        fullScreen();
+        function fullScreen(){
+            document.getElementById("full").onclick=function(){
+                requestFullScreen(document.documentElement);
+            };
+
+            function requestFullScreen(element) {
+                // 判断各种浏览器，找到正确的方法
+                var requestMethod = element.requestFullScreen || //W3C
+                    element.webkitRequestFullScreen || //Chrome等
+                    element.mozRequestFullScreen || //FireFox
+                    element.msRequestFullScreen; //IE11
+                if (requestMethod) {
+                    requestMethod.call(element);
+                }else if (typeof window.ActiveXObject !== "undefined") {//for Internet Explorer
+                    var wscript = new ActiveXObject("WScript.Shell");
+                    if (wscript !== null) {
+                        wscript.SendKeys("{F11}");
+                    }
+                }
+            }
+            //退出全屏 判断浏览器种类
+            /*function exitFull() {
+                // 判断各种浏览器，找到正确的方法
+                var exitMethod = document.exitFullscreen || //W3C
+                    document.mozCancelFullScreen || //FireFox
+                    document.webkitExitFullscreen || //Chrome等
+                    document.webkitExitFullscreen; //IE11
+                if (exitMethod) {
+                    exitMethod.call(document);
+                } else if (typeof window.ActiveXObject !== "undefined") { //for Internet Explorer
+                    var wscript = new ActiveXObject("WScript.Shell");
+                    if (wscript !== null) {
+                        wscript.SendKeys("{F11}");
+                    }
+                }
+            }*/
+        }
+        window.onresize = function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+        };
+    }
+
+    function animate() {
+        if(earth){earth.rotation.y += 0.005;}
+        spriteArr.map(function(s){s.update()});
+        if(window.fly){fly.update();}
+        requestAnimationFrame( animate );
+        //重新渲染
+        renderer.render( scene, camera );
+    }
+    animate();
+</script>
+</body>
+</html>

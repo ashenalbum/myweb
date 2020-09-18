@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>反身而诚-首页</title>
+    <meta name="keywords" content="反身而诚,js小游戏,相册留言">
+    <meta name="description" content="反身而诚的个人空间网站，有js小游戏和相册和留言模块">
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/>
+    <style>
+        #content{/*background: url('../src/public/public/bg-mj.jpg') repeat;*/ /*background-image: radial-gradient(#6a6a6a, #202020);*/ background-size:cover;}
+        #content .cont>.box{width:980px;margin:0 auto;padding-bottom:30px; opacity:0.5;}
+        #content .cont>.box:after{content:" ";display:block;clear:both;height:0;}
+        #content .cont .box .list{width:640px;float:left;font-size:22px;}
+        @media only screen and (min-width: 1400px) {#content .cont>.box{width:1400px;} #content .cont .box .list{width:980px;}  }
+        #content .cont .box .list>a{display:block;position:relative;margin-top:10px;padding-left:160px;height:120px;color:#ffffff;background:rgba(0,0,0,0.4);cursor:pointer;
+            filter:progid:DXImageTransform.Microsoft.gradient(startcolorstr=#66000000,endcolorstr=#66000000);}
+        #content .cont .box .list a:hover{background:rgba(0,0,0,0.5);
+            filter:progid:DXImageTransform.Microsoft.gradient(startcolorstr=#7F000000,endcolorstr=#7F000000);}
+        #content .cont .box .list a>img{position:absolute;left:0;top:0;width:160px;height:120px;}
+        #content .cont .box .list a>div{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;font-size:18px;}
+        #content .cont .box .list a>div .title{height:60px;font-size:22px;line-height:60px;padding-left:10px;}
+        #content .cont .box .list a>div .bewrite{
+            height:60px;font-size:16px;line-height:30px;padding-left:10px;white-space:pre-wrap;overflow:hidden;font-family: "SimSun", "Microsoft YaHei", "HELVETICA";
+            text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;
+        }
+        #content .snail{width:84px;height:53px;position:absolute;z-index:4;bottom:0;left:0;}
+
+        #datetime{width: 322px; position:relative;float: right;font-family:"SimSun","Microsoft YaHei","HELVETICA";}
+        #datetime .clock{overflow:hidden;padding:24px 18px;border-radius:16px;background:#020202;margin-bottom:20px;}
+        #datetime .clock .timebox{float:left;padding:4px 2px;border:1px solid #555555;border-radius:8px;background:#141414;}
+        #datetime .clock .n{width:40px;height:55px;float:left;background:url("../src/index/_animate/number.png")}
+        #datetime .clock .point{width:20px;height:55px;float:left;background:url("../src/index/_animate/number.png") no-repeat -400px 0;}
+        #datetime .clock .guang{position:absolute;top:0;left:0;width:322px;height:113px;background:url("../src/index/_animate/clockGuang.png");}
+        #datetime .date{position:relative;height:304px;border-top:1px solid #555555;background:rgba(255,255,255,0.6);}
+        #datetime .date .title {height:36px;}
+        #datetime .date .title .year,
+        #datetime .date .title .month{box-sizing:border-box;display:block;width:50%;border-left:1px solid #aaaaaa;border-right:1px solid #aaaaaa;height:36px;float:left;text-align:center;font-size:18px;line-height:36px;cursor:pointer;}
+        #datetime .date .title .year:hover,
+        #datetime .date .title .month:hover{box-shadow:0 0 12px #3385ff inset;}
+        #datetime .date .selectyear{display:none;width:160px;height:36px;border:none;padding:0;position:absolute;left:0;top:0;text-align:center;font-size:18px;font-family:"SimSun","Microsoft YaHei","HELVETICA";}
+        #datetime .date .selectyear:focus{outline:none;}
+        #datetime .date .selectmonth{display:none;position:relative;z-index:9;width:322px;height:266px;position:absolute;top:37px;right:0;background:#f9f9f9;}
+        #datetime .date .selectmonth div{width:80.5px;height:88.66px;float:left;text-align:center;line-height:88px;font-size:18px;cursor:pointer;}
+        #datetime .date .selectmonth div:hover{background:#007aff;color:#ffffff;}
+        #datetime .date .daybox{border-top:1px solid #aaaaaa;}
+        #datetime .date .daybox .day{float:left;padding:2px 5px 0 5px;width:36px;height:36px;line-height:36px;text-align:center;font-size:16px;cursor:default}
+        #datetime .date .daybox .day:hover{outline:1px solid #007aff;}
+        #datetime .date .daybox .active{width:34px;height:34px;border:1px dotted #ff0000;}
+        #datetime .date .daybox .badge{background:url("../src/index/_animate/badge.png") no-repeat right bottom;}
+        #datetime .date .daybox .ashen{color: #666666;}
+        #datetime .date .daybox .todayIsFestive{position:relative;animation:festive 2s infinite;-webkit-animation:festive 2s infinite;}
+        @keyframes festive {
+            10%{top:0;}
+            20%{top:-24px;}
+            30%{top:0;}
+            40%{top:-12px;}
+            50%{top:0;}
+            55%{top:-6px;}
+            60%{top:0;}
+        }
+        @-webkit-keyframes festive {
+            10%{top:0;}
+            20%{top:-24px;}
+            30%{top:0;}
+            40%{top:-12px;}
+            50%{top:0;}
+            55%{top:-6px;}
+            60%{top:0;}
+        }
+        #datetime .date .date_attr{display:none;position:absolute;width:290px;padding:10px 0;border:1px solid #cccccc;border-radius:10px;top:0;left:0;background:#ffffff;font-size:16px;}
+        #datetime .date .date_attr p{padding:4px 8px;}
+        #datetime .date .date_attr .mt-6{margin-top:6px;}
+        #datetime .date .date_attr .fs_14{font-size:14px;line-height:1.5;}
+        #datetime .date .date_attr .fs_12{font-size:12px;padding-top:4px;}
+        #datetime .date .date_attr .c_66{color:#666666;}
+        #datetime .date .date_attr .c_99{color:#999999;}
+        .t-indent{text-indent:2em;}
+        .luxun{margin-top:30px;font-size:18px;color:#eeeeee;}
+        .beian{left:0;z-index:99;position:fixed;bottom:0;font-family: monospace;color: #000;font-size:10px;}
+    </style>
+    <link rel="stylesheet" href="../css/live2d.css"/>
+</head>
+<body ondragstart="return false">
+<div id="header">
+    <img src="../src/public/public/head-l.png" class="bg-l"/>
+    <img src="../src/public/public/head-r.png" class="bg-r"/>
+    <img src="../src/public/public/head-t.png" class="bg-t"/>
+    <div class="profile">
+        <div class="box">
+            <div class="rect rect_1"><img _src="../src/public/headerbox/1.jpg"/></div>
+            <div class="rect rect_2"><img _src="../src/public/headerbox/2.jpg"/></div>
+            <div class="rect rect_3"><img _src="../src/public/headerbox/3.jpg"/></div>
+            <div class="rect rect_4"><img _src="../src/public/headerbox/4.jpg"/></div>
+            <div class="rect rect_5"><img _src="../src/public/headerbox/5.jpg"/></div>
+            <div class="rect rect_6"><img _src="../src/public/headerbox/6.jpg"/></div>
+        </div>
+        <div class="spliteBall_up"></div>
+        <div class="spliteBall_down"></div>
+    </div>
+    <div class="menu">
+        <a class="active up" href="/"><span>滥觞</span><i class="action_pt"></i></a>
+        <a href="/album"><span>随行</span><i class="action_pt"></i></a>
+        <a href="/notes"><span>树洞</span><i class="action_pt"></i></a>
+    </div>
+    <div class="showphoto">
+        <img src="../src/public/headerbox/1.jpg"/>
+    </div>
+</div>
+<div id="content">
+    <canvas id="bgcanvas" class="bg_canvas bg_points"></canvas>
+    <!-- <div class="bg_points"></div> -->
+    <div class="cont">
+        <div id="datetime">
+            <!-- <div class="clock">
+                <div class="timebox">
+                    <div class="n h1"></div>
+                    <div class="n h2"></div>
+                    <div class="point"></div>
+                    <div class="n m1"></div>
+                    <div class="n m2"></div>
+                    <div class="point"></div>
+                    <div class="n s1"></div>
+                    <div class="n s2"></div>
+                </div>
+                <div class="guang"></div>
+            </div> -->
+            <div class="date">
+                <div class="title">
+                    <span class="year"></span>
+                    <span class="month"></span>
+                </div>
+                <input type="text" size="4" maxlength="4" class="selectyear" />
+                <div class="selectmonth"></div>
+                <div class="daybox"></div>
+                <div class="date_attr"></div>
+            </div>
+        </div>
+        <!--正文-->
+        <div class="box" >
+            <div class="list"></div>
+        </div>
+    </div>
+    <div id="landlord">
+        <!--地板--<div class="ground"></div>-->
+        <div class="message" style="display:none;"></div>
+        <canvas id="live2d" width="200" height="300"  class="live2d"></canvas>
+        <div id="chat" style="display:none;">
+            <span class="iconfont icon-enter enter"></span>
+            <input class="txt" type="text" placeholder="快来和我聊天吧"/>
+            <input class="btn" type="button" value="ok"/>
+        </div>
+    </div>
+</div>
+<a href="http://www.beian.miit.gov.cn" target="_blank" class="beian">晋ICP备18003528号</a>
+<audio id="bgm" autoplay></audio>
+<script type="text/javascript" src="../js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../js/main.js"></script>
+<script type="text/javascript" src="../js/chineseDate.js"></script>
+<script>
+
+    $(function(){
+        pageInit();
+        bgSnake();
+    });
+    function pageInit(){
+        $.ajax({
+            url:"../src/index/package.json",
+            dataType:"json",
+            success:function(data){
+                for(var i in data){
+                    var dom = '<a href="'+data[i].href+'">' +
+                        '<img _src="'+data[i].img+'"/>' +
+                        '<div>' +
+                        '<p class="title">'+data[i].title+'</p>' +
+                        '<p class="bewrite">'+data[i].text+'</p>' +
+                        '</div>' +
+                        '</a>';
+                    content.find(".box .list").append(dom);
+                }
+                content.find(".box .list a img").each(function(){
+                    $(this).attr("src",$(this).attr("_src"));
+                });
+                content.find(".list>a").click(function(event){
+                    var src = $(this).attr("href");
+                    Mask.add("<iframe src='"+src+"' style='width:1100px;height:700px;background:#ffffff;margin:-350px 0 0 -550px;position:absolute;top:50%;left:50%;'></iframe>");
+                    $(".mask iframe").focus();
+                    event.preventDefault();
+                });
+            }
+        });
+        //设置日期
+        setDates();
+    }
+
+    function setDates(){
+        var datebox = $("#datetime .date");
+        var yearbox = datebox.find(".year");
+        var monthbox = datebox.find(".month");
+        var daybox = datebox.children(".daybox");
+        var clock = $("#datetime>.clock");
+        var dateAttr = datebox.children(".date_attr");
+        var date = new Date();
+        var nowYear = date.getFullYear();
+        var nowMonth = date.getMonth();
+        var nowDate = date.getDate();
+        var location = datebox.offset();
+
+        init();
+        function init(){
+            dateInit();
+            // clockInit();
+            // function clockInit(){
+            //     setInterval(function(){setClock()},10);
+            // }
+            function dateInit(){
+                yearbox.html(nowYear+"年").attr({y:nowYear});
+                monthbox.html(nowMonth+1+"月").attr({m:nowMonth});
+                setMonth();
+                //改变月份
+                var selectmonth = $("#datetime .date .selectmonth");
+                for(var i=0;i<12;i++){selectmonth.append("<div m='"+i+"'>"+(i+1)+"月</div>")}
+                selectmonth.children("div").click(function(){
+                    var m = $(this).attr("m");
+                    monthbox.html(parseInt(m)+1+"月").attr({m:m});
+                    setMonth();
+                });
+                monthbox.click(function(){selectmonth.show(200);$("body").one("click",function(){selectmonth.hide()});return false});
+                //改变年数
+                var selectyear = $("#datetime .date .selectyear");
+                yearbox.click(function(){selectyear.show().focus().val(yearbox.attr("y")).select()});
+                selectyear.blur(function(){
+                    selectyear.hide();
+                    var value = selectyear.val();
+                    if(/^\d{4}$/.test(value)&&parseInt(value)>=1900&&parseInt(value)<=2099&&value!=yearbox.attr("y")){
+                        yearbox.html(value+"年").attr({y:value});setMonth();
+                    }
+                }).bind("input",function(){
+                    var value = selectyear.val();
+                    if(/^\d{4}$/.test(value)&&parseInt(value)>=1900&&parseInt(value)<=2099){selectyear.blur()}
+                });
+            }
+            win.resize(function(){location = datebox.offset()});
+        }
+
+        //日历
+        function setMonth(){
+            var y = yearbox.attr("y");
+            var m = monthbox.attr("m");
+            var oneday = new Date(y,m,1).getDay();
+            var bd;
+            oneday==0?bd=-6:bd=-(oneday-1);
+            var daytt = ["日","一","二","三","四","五","六"];
+            daybox.empty();
+            for(var tt=0;tt<7;tt++){daybox.append("<div class='day'>"+daytt[tt]+"</div>")}
+            for(var i=0;i<42;i++){
+                var d = new Date(y,m,bd);
+                var a = {date:d.getDate(),nowmonth:d.getMonth()==m};
+                var dom = $("<div class='day'></div>");
+                a.nowmonth?0:dom.addClass("ashen ");
+                (y==nowYear)&&(m==nowMonth)&&(bd==nowDate)?dom.addClass("active"):0;
+                var lunar = ChineseCalendar.date2lunar(d);
+                dom.html(a.date).attr({
+                    date:a.date,
+                    lunarYear:lunar.gzY,
+                    lunarMonth:lunar.lunarMonthChiness,
+                    lunarDate:lunar.lunarDayChiness,
+                    star:lunar.start
+                });
+                var festive = ChineseCalendar.isFestive(d.getFullYear(),d.getMonth()+1,d.getDate(),lunar.lunarYear,lunar.lunarMonth,lunar.lunarDay);
+                if(festive){dom.attr({festive:festive}).addClass("badge")}
+                daybox.append(dom);
+                dom.mousemove(function(event){
+                    var x=event.clientX-location.left ,y=event.clientY-location.top+36;
+                    //dateAttr.css({left:x+"px",top:y+"px"});
+                    var w = dateAttr.width();
+                    var h = dateAttr.height()+22;
+                    if(w+event.clientX>content.width()){dateAttr.css({left:x-w-20+"px"})}else{dateAttr.css({left:x+20+"px"})}
+                    if(h+40+event.clientY>win.height()){dateAttr.css({top:y-72-h+"px"})}else{dateAttr.css({top:y+"px"})}
+                }).mouseenter(function(){
+                    var ts = $(this);
+                    dateAttr.show();
+                    dateAttr.empty().html("<p>"
+                        +ts.attr("lunaryear")+"年·"
+                        +ts.attr("lunarmonth")+"·"
+                        +ts.attr("lunardate")
+                        +"<span style='float:right;' class='fs_12 c_66'>"+ts.attr("star")+"</span>"
+                        +"</p>"
+                    );
+                    var festive = ts.attr("festive");
+                    if(festive && festive!="false"){
+						if(!/,/.test(festive)){
+							var festiveDate = ChineseCalendar.festiveList[festive];
+							var dom = "<p class='mt-6'><span>今天是：</span><span style='color:#ff0000;'>"+festiveDate.title+"</span></p>" +
+								"<p class='fs_14 c_99 t-indent'>"+festiveDate.content+"</p>";
+							dateAttr.append(dom);
+						}else{
+							var arr = festive.split(",");
+							for(var i in arr){
+								var festiveDate = ChineseCalendar.festiveList[arr[i]];
+								var dom = "<p class='mt-6'><span>今天是：</span><span style='color:#ff0000;'>"+festiveDate.title+"</span></p>" +
+								"<p class='fs_14 c_99 t-indent'>"+festiveDate.content+"</p>";
+								dateAttr.append(dom);
+							}
+						}
+                    }
+                }).mouseleave(function(){
+                    dateAttr.hide();
+                });
+                bd++;
+            }
+            if(daybox.find(".active").attr("festive")&&daybox.find(".active").attr("festive")!="99"){
+                daybox.find(".active").addClass("todayIsFestive");
+            }
+        }
+        //时钟
+        // function setClock(){
+        //     var date = new Date();
+        //     var hours = date.getHours();
+        //     var minutes = date.getMinutes();
+        //     var seconds = date.getSeconds();
+        //     var h1 = clock.find(".h1");
+        //     var h2 = clock.find(".h2");
+        //     var m1 = clock.find(".m1");
+        //     var m2 = clock.find(".m2");
+        //     var s1 = clock.find(".s1");
+        //     var s2 = clock.find(".s2");
+        //     h1.css({backgroundPositionX:-parseInt(hours/10)*40});
+        //     h2.css({backgroundPositionX:-parseInt(hours%10)*40});
+        //     m1.css({backgroundPositionX:-parseInt(minutes/10)*40});
+        //     m2.css({backgroundPositionX:-parseInt(minutes%10)*40});
+        //     s1.css({backgroundPositionX:-parseInt(seconds/10)*40});
+        //     s2.css({backgroundPositionX:-parseInt(seconds%10)*40});
+        // }
+    }
+</script>
+<script src="../src/public/live2d/live2d.js"></script>
+<script src="../src/public/live2d/setLive2.js"></script>
+<script src="../src/public/myplayer/myplayer.js"></script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1273638543'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273638543%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+</body>
+</html>
