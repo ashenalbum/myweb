@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My first three.js app</title>
+	<style>
+		body { margin: 0; }
+		canvas {display:block; width: 100%; height: 100% }
+		#start{position:absolute; left:0; right:0; top:0; bottom:0; width:16px; height:16px; z-index:9; margin:auto;}
+		#start:before{content:" "; height:1px; width:100%; position:absolute; left:0; top:50%; background:#00ff00;}
+		#start:after{content:" "; width:1px; height:100%; position:absolute; left:50%; top:0; background:#00ff00;}
+		#start.instage{display:block;}
+		.help{background:rgba(0,0,0,0.2); padding:6px; margin:6px; position:absolute; left:0; top:0; z-index:9; border-radius:6px;}
+		.help .keyrow{margin-bottom:6px; text-align:center; font-size:0;}
+		.help .keyrow .key{box-sizing:border-box; display:inline-block; width:20px; height:20px; border:1px solid #ffffff; color:#ffffff; border-radius:2px; line-height:18px; text-align:center; font-size:14px; user-select:none; margin:0 3px;}
+		.help .keyrow .key.key-b{display:block; width:auto;}
+	</style>
+</head>
+<body>
+
+<div id="start"></div>
+<div class="help">
+	<div class="keyrow">
+		<div class="key">W</div>
+	</div>
+	<div class="keyrow">
+		<div class="key">A</div>
+		<div class="key">S</div>
+		<div class="key">D</div>
+	</div>
+	<div class="keyrow">
+		<div class="key key-b">Space</div>
+	</div>
+</div>
+<script src="../js/jquery-1.12.4.min.js"></script>
+<script src="../js/three.js"></script>
+<script src="../js/lib/physi.js"></script>
+<script src="../js/Detector.js"></script>
+<script>
+	var scene;
+	var camera;
+	var controls;
+	var renderer;
+	var rectLen = 100;
+	var earth = null;
+	var boxList = [];
+	var intersects = [];
+
+	Physijs.scripts.worker = '../js/lib/libs/physijs_worker.js';
+    Physijs.scripts.ammo = 'ammo.js';
+	
+	init();
+	
+	function init(){
+		if(!Detector.webgl){Detector.addGetWebGLMessage();return}
+
+		// 场景
+		// scene = new THREE.Scene();
+		scene = new Physijs.Scene();
+        scene.setGravity(new THREE.Vector3(0, -30, 0));
+		// 相机
+		setCamera();
+		// 灯光
+		light();
+		// 添加物体
+		obj();
+		// 渲染
+		render();
+		// 动画
+		animate();
+		// 事件
+		setEvent();
+		// 加载
+		getData();
+	}
+	
+	function setCamera(){
+		camera = new THREE.PerspectiveCamera( 60, window.innerWidth/window.innerHeight, 0.01, 5000 );
+		camera.position.set(0,1,0);
+		camera.lookAt(new THREE.Vector3(0,1,3));
+		camera.$upSpeed = 0;
+	}
+	
+	function obj(){
+		var material = new THREE.LineBasicMaterial({color: 0xffffff});
+		var num = 60;
+		var len = rectLen;
+		var jl = len/num;
+		var str = len/-2;
+		var end = len/2;
+		for(var i=0; i<=num; i++){
+			var x = (len/-2)+(jl*i);
+			var z = x;
+			var lz = new THREE.Geometry();
+			lz.vertices.push(
+				new THREE.Vector3(x, 0, str),
+				new THREE.Vector3(x, 0, end)
+			);
+			scene.add( new THREE.Line( lz, material ) );
+			
+			var lh = new THREE.Geometry();
+			lh.vertices.push(
+				new THREE.Vector3(str, 0, z),
+				new THREE.Vector3(end, 0, z)
+			);
+			scene.add( new THREE.Line( lh, material ) );
+		}
+		
+		//--------- 星空地球 --------------
+		
+        var boxTexture = new THREE.TextureLoader();
+        boxTexture.load("../src/index/_img/star1.jpg",function(texture){
+            var mesh = new THREE.Mesh( new THREE.SphereBufferGeometry(4000, 80, 80 ), new THREE.MeshBasicMaterial( { map: texture ,side: THREE.BackSide} ) );
+            mesh.scale.x = -1;
+			mesh.name = "星空";
+            scene.add(mesh);
+        });
+		boxTexture.load("../src/index/_img/diffuse.jpg",function(map){
+			ball = new THREE.SphereGeometry(200,50,50);
+			// var boxTexture = new THREE.ImageUtils.loadTexture("../src/index/_img/diffuse.jpg");
+			var cubeMaterial = new THREE.MeshPhongMaterial( {map:map} );
+			var cube = new THREE.Mesh( ball, cubeMaterial );
+			cube.name = "地球";
+			earth = cube;
+			earth.r = 1;
+			earth.move = function(){
+				earth.rotation.y += 0.009;
+				earth.r += 0.0003;
+				earth.position.x = 3000*Math.cos(earth.r);
+				earth.position.z = 3000*Math.sin(earth.r) - 2650;
+			}
+			earth.move();
+			scene.add( cube );
+		});
+
+		//----------- 地板 物体 ------------------
+		var mesh = new Physijs.PlaneMesh(new THREE.PlaneGeometry(rectLen, rectLen), Physijs.createMaterial(new THREE.MeshPhongMaterial({color: 0xffffff, alphaTest:255, depthWrite:false})));
+        mesh.rotation.x = -Math.PI / 2;
+        scene.add(mesh);
+	}
+
+	function getData(){
+		$.ajax({
+            url:"../src/index/index.json",
+            dataType:"json",
+            success:function(data){
+				var sphereFriction = 0.5; //摩擦力
+				var sphereRestitution = 2; //反弹力
+				for(var i in data){
+					var li = data[i];
+					var boxTexture = new THREE.TextureLoader();
+					boxTexture.load(li.img,function(map){
+						var size = 4 + parseInt(Math.random()*10);
+						var geometry = new THREE.BoxBufferGeometry( size, size, size);
+						var material = new THREE.MeshBasicMaterial( {map:map, side:THREE.DoubleSide, transparent:true, opacity: 0.6} );
+
+						var cube = new Physijs.BoxMesh(geometry, new Physijs.createMaterial(material), sphereFriction, sphereRestitution);
+						cube.position.x = -60 + Math.random()*120;
+						cube.position.z = -60 + Math.random()*120;
+						cube.position.y = 40 + Math.random()*40;
+						cube.rotation.y = Math.random()*Math.PI;
+						cube.rotation.x = Math.random()*Math.PI;
+						cube.name = li.title;
+						cube.href = li.href;
+						scene.add(cube);
+						boxList.push(cube);
+					});
+				}
+			        
+            }
+        });
+	}
+	
+	function render(){
+		renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+		window.addEventListener('resize', function(){
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }, false);
+	}
+	
+	function light(){
+		var allLight = new THREE.AmbientLight(0xffffff);
+		scene.add(allLight);
+	}
+
+	function animate() {
+		requestAnimationFrame( animate );
+		cameraMove();
+		earth && earth.move();
+		scene.simulate();
+		testClack();
+		renderer.render( scene, camera );
+	};
+	
+	function setEvent(){
+		camera.$up = false;
+		camera.$down = false;
+		camera.$left = false;
+		camera.$right = false;
+		camera.$jump = false;
+		camera.$upSpeed = 0;
+		var inmouse = false;
+		var up32 = true;
+		
+		document.onkeydown = function(e){
+			var keyCode = e.keyCode;
+			switch(keyCode){
+				case 87: camera.$up=true; camera.$down=false; break;
+				case 83: camera.$up=false; camera.$down=true; break;
+				case 65: camera.$left=true; camera.$right=false; break;
+				case 68: camera.$left=false; camera.$right=true; break;
+				case 32: jump(); break;
+			}
+		}
+		document.onkeyup = function(e){
+			var keyCode = e.keyCode;
+			switch(keyCode){
+				case 87: camera.$up=false; break;
+				case 83: camera.$down=false; break;
+				case 65: camera.$left=false; break;
+				case 68: camera.$right=false; break;
+				case 32: up32 = true; break;
+			}
+		}
+		document.onmousemove = function(e){
+			// ---------------------------
+			if(!inmouse){return false}
+			var xlen = e.movementX/200;
+			var ylen = e.movementY/200;
+			var cx = camera.rotation.x+ylen;
+			if(cx>-Math.PI/2){cx=-Math.PI/2}
+			if(cx<-Math.PI*1.5){cx=-Math.PI*1.5}
+			
+			camera.rotation.set(cx, camera.rotation.y, camera.rotation.z);
+			scene.rotation.set(scene.rotation.x, scene.rotation.y+xlen, scene.rotation.z);
+		}
+		document.body.onclick = function(e){
+			console.log(inmouse);
+			inmouse = true;
+			document.body.requestPointerLock();
+			document.getElementById("start").setAttribute("class","instage");
+		}
+		
+		document.addEventListener('pointerlockchange', function () {
+			inmouse = document.pointerLockElement == document.body;
+			console.log(inmouse);
+		}, false);
+		
+		function jump(){
+			if(!up32 || camera.$jump){return}
+			up32 = false;
+			camera.$jump = true;
+			camera.$upSpeed=0.2; 
+		}
+	}
+	
+	function cameraMove(){
+		var speed = 0.05;
+		var pow2 = speed/Math.pow(2,0.5);
+		var moveP = [0,0];
+		var move = [0,0];
+		
+		switch(true){
+			case camera.$up && !camera.$left && !camera.$right: moveP=[0,speed]; break;
+			case camera.$up && camera.$left: moveP=[pow2,pow2]; break;
+			case camera.$up && camera.$right: moveP=[-pow2,pow2]; break;
+			case camera.$down && !camera.$left && !camera.$right: moveP=[0,-speed]; break;
+			case camera.$down && camera.$left: moveP=[pow2,-pow2]; break;
+			case camera.$down && camera.$right: moveP=[-pow2,-pow2]; break;
+			case camera.$left: moveP=[speed,0]; break;
+			case camera.$right: moveP=[-speed,0]; break;
+		}
+		
+		var r = camera.rotation.y;
+		move[0] = -Math.sin(r)*moveP[1] + Math.cos(r)*moveP[0];
+		move[1] = Math.cos(r)*moveP[1] + Math.sin(r)*moveP[0];
+		
+		var x = camera.position.x + move[0];
+		var z = camera.position.z + move[1];
+		x = (x > rectLen/2-2 || x < rectLen/-2+2)?camera.position.x:x;
+		z = (z > rectLen/2-2 || z < rectLen/-2+2)?camera.position.z:z;
+		
+		if(camera.$jump){camera.$upSpeed -= 0.004}
+		var y = camera.position.y + (camera.$upSpeed||0);
+		if(y<1){
+			camera.$jump = false;
+			camera.$upSpeed = 0;
+			y = 1;
+		}
+		
+		camera.position.set(x, y, z);
+	}
+
+	function testClack(){
+		var raycaster = new THREE.Raycaster();
+		var mouse = new THREE.Vector2(0,0);
+		raycaster.setFromCamera(mouse, camera);
+		var save = intersects;
+		for(var i in save){				
+			var o = save[i].object;
+			var material = new THREE.MeshBasicMaterial({map: o.material.map, transparent:true, opacity: 0.6});
+			o.material = material;
+		}
+		intersects = raycaster.intersectObjects(boxList);
+		if(intersects.length && intersects[0].object){
+			var o = intersects[0].object;
+			var material = new THREE.MeshBasicMaterial({map: o.material.map, transparent:false});
+			o.material = material;
+		}
+	}
+</script>
+</body>
+</html>
