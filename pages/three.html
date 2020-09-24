@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>My first three.js app</title>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>反身而诚-滥觞</title>
+    <meta name="keywords" content="反身而诚,js小游戏,相册留言">
+    <meta name="description" content="反身而诚的个人空间网站，有js小游戏和相册和留言模块">
+    <link rel="stylesheet" href="../css/main.css" />
 	<style>
 		body { margin: 0; }
 		canvas {display:block; width: 100%; height: 100% }
@@ -9,7 +18,7 @@
 		#start:before{content:" "; height:1px; width:100%; position:absolute; left:0; top:50%; background:#00ff00;}
 		#start:after{content:" "; width:1px; height:100%; position:absolute; left:50%; top:0; background:#00ff00;}
 		#start.instage{display:block;}
-		.help{background:rgba(0,0,0,0.2); padding:6px; margin:6px; position:absolute; left:0; top:0; z-index:9; border-radius:6px;}
+		.help{background:rgba(0,0,0,0.2); padding:6px; margin:6px; position:absolute; right:0; bottom:0; z-index:9; border-radius:6px;}
 		.help .keyrow{margin-bottom:6px; text-align:center; font-size:0;}
 		.help .keyrow .key{box-sizing:border-box; display:inline-block; width:20px; height:20px; border:1px solid #ffffff; color:#ffffff; border-radius:2px; line-height:18px; text-align:center; font-size:14px; user-select:none; margin:0 3px;}
 		.help .keyrow .key.key-b{display:block; width:auto;}
@@ -32,6 +41,7 @@
 	</div>
 </div>
 <script src="../js/jquery-1.12.4.min.js"></script>
+<script src="../js/main.js"></script>
 <script src="../js/three.js"></script>
 <script src="../js/lib/physi.js"></script>
 <script src="../js/Detector.js"></script>
@@ -76,8 +86,9 @@
 	function setCamera(){
 		camera = new THREE.PerspectiveCamera( 60, window.innerWidth/window.innerHeight, 0.01, 5000 );
 		camera.position.set(0,1,0);
-		camera.lookAt(new THREE.Vector3(0,1,3));
+		camera.lookAt(new THREE.Vector3(0,1,-3));
 		camera.$upSpeed = 0;
+		camera.$rx = 0;
 	}
 	
 	function obj(){
@@ -147,23 +158,27 @@
 				var sphereRestitution = 2; //反弹力
 				for(var i in data){
 					var li = data[i];
-					var boxTexture = new THREE.TextureLoader();
-					boxTexture.load(li.img,function(map){
-						var size = 4 + parseInt(Math.random()*10);
-						var geometry = new THREE.BoxBufferGeometry( size, size, size);
-						var material = new THREE.MeshBasicMaterial( {map:map, side:THREE.DoubleSide, transparent:true, opacity: 0.6} );
+					var name = li.title;
+					var href = li.href;
+					(function(name,href){
+						var boxTexture = new THREE.TextureLoader();
+						boxTexture.load(li.img,function(map){
+							var size = 4 + parseInt(Math.random()*10);
+							var geometry = new THREE.BoxBufferGeometry( size, size, size);
+							var material = new THREE.MeshBasicMaterial( {map:map, side:THREE.DoubleSide, transparent:true, opacity: 0.8} );
 
-						var cube = new Physijs.BoxMesh(geometry, new Physijs.createMaterial(material), sphereFriction, sphereRestitution);
-						cube.position.x = -60 + Math.random()*120;
-						cube.position.z = -60 + Math.random()*120;
-						cube.position.y = 40 + Math.random()*40;
-						cube.rotation.y = Math.random()*Math.PI;
-						cube.rotation.x = Math.random()*Math.PI;
-						cube.name = li.title;
-						cube.href = li.href;
-						scene.add(cube);
-						boxList.push(cube);
-					});
+							var cube = new Physijs.BoxMesh(geometry, new Physijs.createMaterial(material), sphereFriction, sphereRestitution);
+							cube.position.x = -60 + Math.random()*120;
+							cube.position.z = -60 + Math.random()*120;
+							cube.position.y = 40 + Math.random()*40;
+							cube.rotation.y = Math.random()*Math.PI;
+							cube.rotation.x = Math.random()*Math.PI;
+							cube.name = name;
+							cube.href = href;
+							scene.add(cube);
+							boxList.push(cube);
+						});
+					})(name,href)
 				}
 			        
             }
@@ -202,6 +217,8 @@
 		camera.$right = false;
 		camera.$jump = false;
 		camera.$upSpeed = 0;
+		camera.$rx = 0;
+		camera.$ry = 0;
 		var inmouse = false;
 		var up32 = true;
 		
@@ -226,43 +243,50 @@
 			}
 		}
 		document.onmousemove = function(e){
-			// ---------------------------
 			if(!inmouse){return false}
-			var xlen = e.movementX/200;
-			var ylen = e.movementY/200;
-			var cx = camera.rotation.x+ylen;
-			if(cx>-Math.PI/2){cx=-Math.PI/2}
-			if(cx<-Math.PI*1.5){cx=-Math.PI*1.5}
-			
-			camera.rotation.set(cx, camera.rotation.y, camera.rotation.z);
-			scene.rotation.set(scene.rotation.x, scene.rotation.y+xlen, scene.rotation.z);
+			camera.$rx += e.movementX/400;
+			camera.$ry += -e.movementY/400;
+			if(camera.$ry>Math.PI/2){camera.$ry=Math.PI/2}
+			if(camera.$ry<-Math.PI/2){camera.$ry=-Math.PI/2}
+			var a = camera.$ry;
+			var b = camera.$rx;
+
+			var vx = 10 * Math.cos(a) * Math.sin(b);
+			var vy = 10 * Math.sin(a);
+			var vz = -10 * Math.cos(a) * Math.cos(b);
+			var e = new THREE.Vector3(camera.position.x+vx , camera.position.y+vy , camera.position.z+vz);
+			camera.lookAt(e);
 		}
 		document.body.onclick = function(e){
-			console.log(inmouse);
-			inmouse = true;
-			document.body.requestPointerLock();
-			document.getElementById("start").setAttribute("class","instage");
+			if(!inmouse){
+				inmouse = true;
+				document.body.requestPointerLock();
+				document.getElementById("start").setAttribute("class","instage");
+			}else if(intersects.length){
+				document.exitPointerLock();
+				var src = intersects[0].object.href;
+				Mask.add("<iframe src='"+src+"' style='width:1100px;height:700px;background:#ffffff;margin:-350px 0 0 -550px;position:absolute;top:50%;left:50%;'></iframe>");
+				$(".mask iframe").focus();
+			}
 		}
 		
 		document.addEventListener('pointerlockchange', function () {
 			inmouse = document.pointerLockElement == document.body;
-			console.log(inmouse);
 		}, false);
 		
 		function jump(){
 			if(!up32 || camera.$jump){return}
 			up32 = false;
 			camera.$jump = true;
-			camera.$upSpeed=0.2; 
+			camera.$upSpeed=0.4; 
 		}
 	}
 	
 	function cameraMove(){
-		var speed = 0.05;
+		var speed = 0.06;
 		var pow2 = speed/Math.pow(2,0.5);
 		var moveP = [0,0];
 		var move = [0,0];
-		
 		switch(true){
 			case camera.$up && !camera.$left && !camera.$right: moveP=[0,speed]; break;
 			case camera.$up && camera.$left: moveP=[pow2,pow2]; break;
@@ -273,13 +297,12 @@
 			case camera.$left: moveP=[speed,0]; break;
 			case camera.$right: moveP=[-speed,0]; break;
 		}
-		
-		var r = camera.rotation.y;
+		var r = camera.$rx;
 		move[0] = -Math.sin(r)*moveP[1] + Math.cos(r)*moveP[0];
 		move[1] = Math.cos(r)*moveP[1] + Math.sin(r)*moveP[0];
-		
-		var x = camera.position.x + move[0];
-		var z = camera.position.z + move[1];
+
+		var x = camera.position.x - move[0];
+		var z = camera.position.z - move[1];
 		x = (x > rectLen/2-2 || x < rectLen/-2+2)?camera.position.x:x;
 		z = (z > rectLen/2-2 || z < rectLen/-2+2)?camera.position.z:z;
 		
@@ -290,7 +313,6 @@
 			camera.$upSpeed = 0;
 			y = 1;
 		}
-		
 		camera.position.set(x, y, z);
 	}
 
@@ -301,7 +323,7 @@
 		var save = intersects;
 		for(var i in save){				
 			var o = save[i].object;
-			var material = new THREE.MeshBasicMaterial({map: o.material.map, transparent:true, opacity: 0.6});
+			var material = new THREE.MeshBasicMaterial({map: o.material.map, transparent:true, opacity: 0.8});
 			o.material = material;
 		}
 		intersects = raycaster.intersectObjects(boxList);
