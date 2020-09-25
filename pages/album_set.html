@@ -72,9 +72,19 @@
 		.loading{display:none; position:fixed; top:0; left:0; bottom:0; right:0; background:rgba(0,0,0,0); z-index:99;}
 		.loading.show{display:block;}
 		.loading .loadtxt{position:absolute; left:50%; top:50%; margin:-50px 0 0 -50px; width:100px; height:100px; border-radius:10px; line-height:100px; text-align:center; background:rgba(0,0,0,0.5); color:#ffffff;}
+
+		.menus{left:auto; right:10px;}
     </style>
 </head>
 <body>
+<div class="menus">
+	<img src="../src/public/public/mn-0.png" class="menu" />
+	<div class="ls">
+		<a class="mn mn1" href="/three" title="滥觞"><img src="../src/public/public/mn-1.png" class="img" /></a>
+		<a class="mn mn2" href="/album" title="相册"><img src="../src/public/public/mn-2.png" class="img" /></a>
+		<a class="mn mn3" href="/notes" title="树洞"><img src="../src/public/public/mn-3.png" class="img" /></a>
+	</div>
+</div>
 <div id="mulu">
 	<div class="adds">
 		<button class="btn" @click="addLb">添加类别</button>
