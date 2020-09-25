@@ -212,6 +212,11 @@
 <script type="text/javascript" src="../js/chineseDate.js"></script>
 <script>
 
+var win = $(window);
+var body = $("body");
+var header = $("#header");
+var content = $("#content");
+
     $(function(){
         pageInit();
         bgSnake();
@@ -234,6 +239,7 @@
             dataType:"json",
             success:function(data){
                 for(var i in data){
+                    if(data[i].noframe){continue}
                     var dom = '<a href="'+data[i].href+'">' +
                         '<img _src="'+data[i].img+'"/>' +
                         '<div>' +

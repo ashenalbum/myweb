@@ -64,6 +64,7 @@
 	var renderer;
 	var rectLen = 100;
 	var earth = null;
+	var starBg = null;
 	var boxList = [];
 	var intersects = [];
 
@@ -135,7 +136,8 @@
             var mesh = new THREE.Mesh( new THREE.SphereBufferGeometry(4000, 80, 80 ), new THREE.MeshBasicMaterial( { map: texture ,side: THREE.BackSide} ) );
             mesh.scale.x = -1;
 			mesh.name = "星空";
-            scene.add(mesh);
+			scene.add(mesh);
+			starBg = mesh;
         });
 		boxTexture.load("../src/index/_img/diffuse.jpg",function(map){
 			ball = new THREE.SphereGeometry(200,50,50);
@@ -172,7 +174,7 @@
 					var li = data[i];
 					var name = li.title;
 					var href = li.href;
-					(function(name,href){
+					(function(name,href,noframe){
 						var boxTexture = new THREE.TextureLoader();
 						boxTexture.load(li.img,function(map){
 							var size = 4 + parseInt(Math.random()*10);
@@ -187,10 +189,11 @@
 							cube.rotation.x = Math.random()*Math.PI;
 							cube.name = name;
 							cube.href = href;
+							cube.noframe = noframe;
 							scene.add(cube);
 							boxList.push(cube);
 						});
-					})(name,href)
+					})(name,href,li.noframe)
 				}
 			        
             }
@@ -217,6 +220,7 @@
 		requestAnimationFrame( animate );
 		cameraMove();
 		earth && earth.move();
+		starBg && (starBg.rotation.y+=0.0005);
 		scene.simulate();
 		testClack();
 		renderer.render( scene, camera );
@@ -278,6 +282,10 @@
 				camera.$up = camera.$down = camera.$left = camera.$right = false;
 				document.exitPointerLock();
 				var src = intersects[0].object.href;
+				if(intersects[0].object.noframe){
+					window.location.href = src;
+					return;
+				}
 				Mask.add("<iframe src='"+src+"' style='width:1100px;height:700px;background:#ffffff;margin:-350px 0 0 -550px;position:absolute;top:50%;left:50%;'></iframe>");
 				$(".mask iframe").focus();
 			}
