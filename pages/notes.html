@@ -8,14 +8,14 @@
     <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
     <title>反身而诚-树洞</title>
-    <meta name="keywords" content="反身而诚,js小游戏,相册留言">
-    <meta name="description" content="反身而诚的个人空间网站，有js小游戏和相册和留言模块">
+    <meta name="keywords" content="反身而诚,小游戏,相册,留言">
+    <meta name="description" content="反身而诚的个人空间网站,相册,留言">
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="../css/live2d.css"/>
     <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/>
     <style>
         #bgcanvas{background: url('../src/public/public/bg-mj.jpg') repeat;background-size:cover;}
-        .blur {position:absolute; top:0;left:0;right:0;bottom:0; z-index:-1; background:url('../src/public/public/bg-w.jpg') repeat center center; background-size:100% 100%; opacity:0.92;}
+        .blur {position:absolute; top:0;left:0;right:0;bottom:0; z-index:-1; background:url('../src/public/public/bg-w.jpg') repeat center center; background-size:100% 100%; opacity:0.94;}
         #content{overflow:hidden;}
         #content .cont{overflow:hidden;}
         #content .cont .box{position:absolute;width:980px;margin-left:-490px;left:50%;top:0;bottom:225px;overflow-y:auto;color:#ffffff;}
@@ -189,7 +189,7 @@ function notes(){
     var activePage = 0;
     var listbox = $("#listbox");
     var randomX = listbox.width()-235;
-    var randomY = listbox.height()-235;
+    var randomY = win.height()-30-235;
     getData(0,function(){$("#listbox .none").remove();});
     //获取留言
     function getData(getpage,callback){

@@ -8,11 +8,13 @@
     <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
     <title>反身而诚-滥觞</title>
-    <meta name="keywords" content="反身而诚,js小游戏,相册留言">
-    <meta name="description" content="反身而诚的个人空间网站，有js小游戏和相册和留言模块">
+    <meta name="keywords" content="反身而诚,小游戏,相册,留言">
+    <meta name="description" content="反身而诚的个人空间网站,相册,留言">
     <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/>
 	<style>
 		body { margin: 0; }
+		#content{overflow:hidden;}
 		canvas {display:block; width: 100%; height: 100% }
 		#start{position:absolute; left:0; right:0; top:0; bottom:0; width:16px; height:16px; z-index:9; margin:auto;}
 		#start:before{content:" "; height:1px; width:100%; position:absolute; left:0; top:50%; background:#00ff00;}
@@ -33,20 +35,23 @@
 		<a class="mn mn3" href="/notes" title="树洞"><img src="../src/public/public/mn-3.png" class="img" /></a>
 	</div>
 </div>
-<div id="start"></div>
-<div class="help">
-	<div class="keyrow">
-		<div class="key">W</div>
-	</div>
-	<div class="keyrow">
-		<div class="key">A</div>
-		<div class="key">S</div>
-		<div class="key">D</div>
-	</div>
-	<div class="keyrow">
-		<div class="key key-b">Space</div>
+<div id="content">
+	<div id="start"></div>
+	<div class="help">
+		<div class="keyrow">
+			<div class="key">W</div>
+		</div>
+		<div class="keyrow">
+			<div class="key">A</div>
+			<div class="key">S</div>
+			<div class="key">D</div>
+		</div>
+		<div class="keyrow">
+			<div class="key key-b">Space</div>
+		</div>
 	</div>
 </div>
+<audio id="bgm" autoplay></audio>
 <script src="../js/jquery-1.12.4.min.js"></script>
 <script src="../js/main.js"></script>
 <script src="../js/three.js"></script>
@@ -195,7 +200,7 @@
 	function render(){
 		renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
-		document.body.appendChild( renderer.domElement );
+		content.append(renderer.domElement);
 		window.addEventListener('resize', function(){
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -270,6 +275,7 @@
 				document.body.requestPointerLock();
 				document.getElementById("start").setAttribute("class","instage");
 			}else if(intersects.length){
+				camera.$up = camera.$down = camera.$left = camera.$right = false;
 				document.exitPointerLock();
 				var src = intersects[0].object.href;
 				Mask.add("<iframe src='"+src+"' style='width:1100px;height:700px;background:#ffffff;margin:-350px 0 0 -550px;position:absolute;top:50%;left:50%;'></iframe>");
@@ -341,5 +347,6 @@
 		}
 	}
 </script>
+<script src="../src/public/myplayer/myplayer.js"></script>
 </body>
 </html>

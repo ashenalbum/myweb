@@ -7,6 +7,7 @@
     <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
 	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
 	<title>设置</title>
+    <link rel="stylesheet" href="../css/main.css" />
     <style>
 		@font-face {font-family: "iconfont";
 			src: url('iconfont.eot?t=1599634808236'); /* IE9 */
@@ -168,12 +169,15 @@
 var app = new Vue({
 	el: '#mulu',
 	data: {
+		urlKey: "",
 		activeLi: -1,
 		photoArr: [],
 		yulanbox: null
 	},
 	created(){
 		var ts = this;
+		var match = window.location.search.match(/key=([^&]+)/);
+		urlKey = match && match[1];
 		loadingShow();
 		$.ajax({
 			url: "../src/album/album.json",
@@ -274,6 +278,7 @@ var app = new Vue({
 			var formData = new FormData();
 			formData.append("file",file);
 			formData.append("key",key);
+			formData.append("urlKey",urlKey);
 
 			loadingShow();
 			var ts = this;

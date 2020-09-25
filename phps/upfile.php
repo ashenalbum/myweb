@@ -3,9 +3,10 @@ header("content-type:text/html;charset=utf-8");
 
 $key = $_POST['key'];
 $file = $_FILES['file'];
+$urlKey = $_POST['urlKey'];
 $obj = array();
 
-if(!isset($key) || !isset($file)){
+if(!isset($key) || !isset($file) || $urlKey!="1049"){
     $obj['code'] = 1;
     $obj['msg'] = "参数有误";
     echo json_encode($obj);
