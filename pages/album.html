@@ -129,8 +129,11 @@
     var photoArr;
     var meidaLocation = "../src/album/medium/";
     var fullPage = false;
+    var urlPage = null;
 
     $(function(){
+        urlPage = window.location.search.match(/[\&|?]page=([^\&$]+)/);
+        urlPage = urlPage && Number(urlPage[1]);
         $.ajax({
             url:"../src/album/album.json",
             type:"post",
@@ -288,6 +291,7 @@
             var goto = $(this).attr("goto")||$(this).parent().attr("goto");
             book.turn("page",parseInt(goto));
         });
+        book.turn("page",parseInt(urlPage+3+1));
         
         var mouseX = 0;
         var mouseY = 0;
