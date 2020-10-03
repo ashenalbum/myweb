@@ -291,7 +291,7 @@
             var goto = $(this).attr("goto")||$(this).parent().attr("goto");
             book.turn("page",parseInt(goto));
         });
-        book.turn("page",parseInt(urlPage+3+1));
+		if(urlPage){book.turn("page",parseInt(urlPage+3+1))}
         
         var mouseX = 0;
         var mouseY = 0;
