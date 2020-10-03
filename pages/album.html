@@ -12,8 +12,8 @@
     <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
     <title>反身而诚-相册</title>
-    <meta name="keywords" content="反身而诚,js小游戏,相册留言">
-    <meta name="description" content="反身而诚的个人空间网站，有js小游戏和相册和留言">
+    <meta name="keywords" content="反身而诚,小游戏,相册,留言">
+    <meta name="description" content="反身而诚的个人空间网站,相册,留言">
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="../css/live2d.css"/>
     <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/>
@@ -72,29 +72,12 @@
     </style>
 </head>
 <body>
-<div id="header" style="display:block;">
-    <img src="../src/public/public/head-l.png" class="bg-l"/>
-    <img src="../src/public/public/head-r.png" class="bg-r"/>
-    <img src="../src/public/public/head-t.png" class="bg-t"/>
-    <div class="profile">
-        <div class="box">
-            <div class="rect rect_1"><img _src="../src/public/headerbox/1.jpg"/></div>
-            <div class="rect rect_2"><img _src="../src/public/headerbox/2.jpg"/></div>
-            <div class="rect rect_3"><img _src="../src/public/headerbox/3.jpg"/></div>
-            <div class="rect rect_4"><img _src="../src/public/headerbox/4.jpg"/></div>
-            <div class="rect rect_5"><img _src="../src/public/headerbox/5.jpg"/></div>
-            <div class="rect rect_6"><img _src="../src/public/headerbox/6.jpg"/></div>
-        </div>
-        <div class="spliteBall_up"></div>
-        <div class="spliteBall_down"></div>
-    </div>
-    <div class="menu">
-        <!-- <a href="/"><span>滥觞</span></a> -->
-        <a class="active" href="/album"><span>相册</span></a>
-        <a href="/notes"><span>树洞</span></a>
-    </div>
-    <div class="showphoto">
-        <img src="../src/public/headerbox/1.jpg"/>
+<div class="menus">
+    <img src="../src/public/public/mn-0.png" class="menu" />
+    <div class="ls">
+        <a class="mn mn1" href="/three" title="滥觞"><img src="../src/public/public/mn-1.png" class="img" /></a>
+        <a class="mn mn2" href="/album" title="相册"><img src="../src/public/public/mn-2.png" class="img" /></a>
+        <a class="mn mn3" href="/notes" title="树洞"><img src="../src/public/public/mn-3.png" class="img" /></a>
     </div>
 </div>
 <div id="content">
@@ -146,8 +129,11 @@
     var photoArr;
     var meidaLocation = "../src/album/medium/";
     var fullPage = false;
+    var urlPage = null;
 
     $(function(){
+        urlPage = window.location.search.match(/[\&|?]page=([^\&$]+)/);
+        urlPage = urlPage && Number(urlPage[1]);
         $.ajax({
             url:"../src/album/album.json",
             type:"post",
@@ -165,7 +151,7 @@
         $("#bookbox").addClass("bookbox");
 
         var book = $("#book");
-        var height = content.height()-80;
+        var height = content.height()-200;
         var width = parseInt(height/1.414*2);
         var pageLength = 3;
         var nowPage = 1;
@@ -305,6 +291,7 @@
             var goto = $(this).attr("goto")||$(this).parent().attr("goto");
             book.turn("page",parseInt(goto));
         });
+        book.turn("page",parseInt(urlPage+3+1));
         
         var mouseX = 0;
         var mouseY = 0;
@@ -394,7 +381,7 @@
                 if(data.code!=0){Mask(data.msg);return}
                 var src = data.src;
                 newWindow.target = "_blank";
-                newWindow.location.href = src;
+                newWindow.location.href = src + "?key=" + key;
             }
         })
     }

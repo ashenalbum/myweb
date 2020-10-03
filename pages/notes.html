@@ -7,22 +7,17 @@
     <meta name="renderer" content="webkit">
     <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
-    <title>反身而诚-留言</title>
-    <meta name="keywords" content="反身而诚,js小游戏,相册留言">
-    <meta name="description" content="反身而诚的个人空间网站，有js小游戏和相册和留言模块">
+    <title>反身而诚-树洞</title>
+    <meta name="keywords" content="反身而诚,小游戏,相册,留言">
+    <meta name="description" content="反身而诚的个人空间网站,相册,留言">
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="../css/live2d.css"/>
     <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/>
     <style>
         #bgcanvas{background: url('../src/public/public/bg-mj.jpg') repeat;background-size:cover;}
-        .blur {
-            position:absolute;
-            top:0;left:0;right:0;bottom:0;
-            z-index:-1;
-            background:url('../src/public/public/bg-w.jpg') repeat center center;
-			background-size:100% 100%;
-            opacity:0.8;
-        }
+        .blur {position:absolute; top:0;left:0;right:0;bottom:0; z-index:-1; background:url('../src/public/public/bg-w.jpg') repeat center center; background-size:100% 100%; opacity:0.94;}
+        #content{overflow:hidden;}
+        #content .cont{overflow:hidden;}
         #content .cont .box{position:absolute;width:980px;margin-left:-490px;left:50%;top:0;bottom:225px;overflow-y:auto;color:#ffffff;}
         #listbox{position:relative;overflow:hidden!important;}
         #listbox .my-tab{position:absolute;box-sizing:border-box;width:235px;height:235px;user-select: none;}
@@ -72,16 +67,18 @@
         #listbox .my-tab.style8 .bg-cont{background-image:url("../src/notes/tab/c8-2.gif");}
         #listbox .my-tab.style8 .bg-btm{background-image:url("../src/notes/tab/c8-3.gif");}
 
-        #content .cont .pages{position:absolute;width:100%;height:30px;text-align:center;bottom:195px;user-select: none;font-family:"Microsoft YaHei","SimSun","Arial Narrow","HELVETICA";}
+        #content .cont .pages{position:absolute;width:100%;height:30px;text-align:center;bottom:0;user-select: none;font-family:"Microsoft YaHei","SimSun","Arial Narrow","HELVETICA";}
         #content .cont .pages a{line-height: 30px;margin: 0 8px;background: #ffffff;padding: 5px 12px;cursor:pointer;vertical-align: middle;}
         #content .cont .pages a:hover{outline:2px solid #ffffff;}
         #content .cont .pages .active{background:#000000;color:#ffffff;}
         #content .cont .pages span{line-height:30px;padding: 5px 12px;cursor: pointer;vertical-align: middle;font-size:12px;color: #ffffff;}
         #content .cont .loading{opacity:0.5;}
-        #form{position:absolute;left:50%;bottom:0;width:980px;height:185px;margin:0 0 10px -490px;font-size:0;-webkit-text-size-adjust:none;}
+
+        #form{position:absolute; z-index:99; left:50%; bottom:-200px; width:980px; height:185px; margin:0 0 0 -490px; font-size:0; -webkit-text-size-adjust:none; transition:bottom 0.3s;}
+        #form.show{bottom:0;}
         #form .length{color:#ffbbbb;position:absolute;right:22px;bottom:50px;font-size:18px;line-height:30px;}
 
-        #text{width:960px;height:115px;padding:10px;font-size:18px;line-height:135%;border:none;resize: none;outline:none;background: rgba(0,0,0,0.2);color:#ffffff;overflow-x:hidden;overflow-y:scroll;}
+        #text{width:960px;height:115px;padding:10px;font-size:18px;line-height:135%;border:none;resize: none;outline:none;background: rgba(0,0,0,0.7);color:#ffffff;overflow-x:hidden;overflow-y:scroll;}
         #text::-webkit-input-placeholder{color:#cccccc;}
         #text::-moz-placeholder{color:#cccccc;}
         #text:-moz-placeholder{color:#cccccc;}
@@ -90,7 +87,7 @@
         #form label{display:block;position:relative;width:100%;height:50px;background:#fcfcfc;}
         #name{width:700px;height:40px;padding:0;margin:5px 5px 5px 20px;border:0;outline:0;font-size:18px;line-height:40px;}
         #name:focus{outline:none;border:0;padding:0;}
-        @media only screen and (min-width: 1400px) {#content .cont .box{width:1200px;margin-left:-600px;} #form{width:1200px;margin-left:-600px;} #text{width:1180px;} #name{width:1000px;}}
+
         #submit{position:absolute;right:0;top:0;border:none;margin:0;padding:0;width:120px;height:100%;background:#007aff;color:#ffffff;outline:none;cursor:pointer;font-size:16px;}
         #submit:hover{font-size:18px;}
         #form .submit_disabled{background:#cccccc;}
@@ -110,32 +107,25 @@
         #form .stylebox{display:none;position:absolute;bottom:100%;left:50px;z-index:30;width:60px;border:1px solid #000;background:#fff;}
         #form .stylebox .item{border-top:1px solid transparent;border-bottom:1px solid transparent;height:30px;}
         #form .stylebox .item:hover{border-color:#000;}
+
+        .feather{position:absolute; left:50%; bottom:26px; margin-left:-550px; width:90px; height:135px; cursor:pointer;}
+
+        @media only screen and (min-width: 1400px) {
+            #content .cont .box{width:1200px;margin-left:-600px;}
+            #form{width:1200px;margin-left:-600px;}
+            #text{width:1180px;}
+            #name{width:1000px;}
+            .feather{margin-left:-660px!important;}
+        }
     </style>
 </head>
 <body>
-<div id="header">
-    <img src="../src/public/public/head-l.png" class="bg-l"/>
-    <img src="../src/public/public/head-r.png" class="bg-r"/>
-    <img src="../src/public/public/head-t.png" class="bg-t"/>
-    <div class="profile">
-        <div class="box">
-            <div class="rect rect_1"><img _src="../src/public/headerbox/1.jpg"/></div>
-            <div class="rect rect_2"><img _src="../src/public/headerbox/2.jpg"/></div>
-            <div class="rect rect_3"><img _src="../src/public/headerbox/3.jpg"/></div>
-            <div class="rect rect_4"><img _src="../src/public/headerbox/4.jpg"/></div>
-            <div class="rect rect_5"><img _src="../src/public/headerbox/5.jpg"/></div>
-            <div class="rect rect_6"><img _src="../src/public/headerbox/6.jpg"/></div>
-        </div>
-        <div class="spliteBall_up"></div>
-        <div class="spliteBall_down"></div>
-    </div>
-    <div class="menu">
-        <!-- <a href="/"><span>滥觞</span></a> -->
-        <a href="/album"><span>相册</span></a>
-        <a class="active" href="/notes"><span>树洞</span></a>
-    </div>
-    <div class="showphoto">
-        <img src="../src/public/headerbox/1.jpg"/>
+<div class="menus">
+    <img src="../src/public/public/mn-0.png" class="menu" />
+    <div class="ls">
+        <a class="mn mn1" href="/three" title="滥觞"><img src="../src/public/public/mn-1.png" class="img" /></a>
+        <a class="mn mn2" href="/album" title="相册"><img src="../src/public/public/mn-2.png" class="img" /></a>
+        <a class="mn mn3" href="/notes" title="树洞"><img src="../src/public/public/mn-3.png" class="img" /></a>
     </div>
 </div>
 <div id="content">
@@ -150,7 +140,7 @@
         <div id="pages" class="pages"></div>
         <form id="form" method="post" action="../word.php">
             <span class="length"><i class="nowleng"> 0 </i>/<i> 500 </i></span>
-            <textarea id="text" name="text" placeholder="光标闪闪抒想法，键盘声声送评论，这，就是对作者最大的鼓励！" maxlength="500"></textarea>
+            <textarea id="text" name="text" placeholder="光标闪闪抒想法，键盘声声送评论" maxlength="500"></textarea>
             <label>
                 <div class="iconbox"></div>
                 <div class="stylebox"></div>
@@ -163,6 +153,7 @@
             <input class="iconid" type="hidden" name="icon" value="0" />
             <input class="styleid" type="hidden" name="style" value="1" />
         </form>
+        <img src="../src/album/_book/feather.gif" class="feather" />
     </div>
     <div id="landlord">
         <!--地板--<div class="ground"></div>-->
@@ -181,6 +172,7 @@
 <script>
 var removeUrl = "";
 var key = "";
+var form = $("#form");
 
 $(function(){
     icon();
@@ -193,11 +185,11 @@ $(function(){
 
 function notes(){
     var zindex = 1;
-    var setPageLen = 16;
+    var setPageLen = 32;
     var activePage = 0;
     var listbox = $("#listbox");
     var randomX = listbox.width()-235;
-    var randomY = listbox.height()-235;
+    var randomY = win.height()-30-235;
     getData(0,function(){$("#listbox .none").remove();});
     //获取留言
     function getData(getpage,callback){
@@ -398,10 +390,11 @@ function notes(){
 
     //content大小
     win.resize(function(){
-        content.children(".cont").children(".box").css({height:$(this).height()-102-225+"px"});
+        content.children(".cont").children(".box").css({height:$(this).height()-30+"px"});
     }).resize();
 
 }
+
 //选择颜色
 function styleSelect(){
     var color = ["#f0f0f0","#ffdeff","#ffcccc","#ffe3b8","#ffffcc","#c5ffc2","#ceecff","#e8ddff"];
@@ -481,6 +474,12 @@ function setname(){
     if(name){$("#name").val(name);}
 }
 function setEvent(){
+    form.siblings(".feather").on("click",function(){
+        form.addClass("show");
+        $(document.body).one("click",function(){form.removeClass("show")});
+        return false;
+    })
+    form.on("click",function(){return false});
     $(document.body).on("keyup",function(event){
         if(event && event.keyCode && event.keyCode=="82"){
             if($("#text").is(":focus") || $("#name").is(":focus")){return};

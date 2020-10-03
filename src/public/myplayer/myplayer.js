@@ -4,6 +4,9 @@
 	var list = $("<div id='list'></div>");
 	var audio;
 	var arr = [{
+		url:"../src/public/myplayer/sound/Handclap.mp3",
+		name:"Handclap"
+	},{
 		url:"../src/public/myplayer/sound/0.mp3",
 		name:"秦时明月 - 燕鸣骊歌 - 纯音乐"
 	},{

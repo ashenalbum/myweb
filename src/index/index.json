@@ -60,15 +60,22 @@
     "text":"世界聚焦于你"
   },
   {
-	"href":"../src/index/Wuziqi/index.html",
-	"img":"../src/index/Wuziqi/img.jpg",
-	"title":"五子棋",
-	"text":"( • ̀ω•́ )✧"
+    "href":"../src/index/Wuziqi/index.html",
+    "img":"../src/index/Wuziqi/img.jpg",
+    "title":"五子棋",
+    "text":"( • ̀ω•́ )✧"
   },
   {
-	"href":"../src/index/Taiqiu/index.html",
-	"img":"../src/index/Taiqiu/img.jpg",
-	"title":"台球",
-	"text":"( • ̀ω•́ )✧"
+    "href":"../src/index/Taiqiu/index.html",
+    "img":"../src/index/Taiqiu/img.jpg",
+    "title":"台球",
+    "text":"( • ̀ω•́ )✧"
+  },
+  {
+    "noframe": true,
+    "href": "/pages/index.html",
+    "img": "../src/index/oldindex/oldindex.png",
+    "title": "原版首页",
+    "text": ""
   }
 ]

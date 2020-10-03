@@ -7,106 +7,6 @@ var body = $("body");
 var header = $("#header");
 var content = $("#content");
 var stopInterval = false;
-//精灵球
-function spliteBall(bool){
-    var ball = header.children(".profile");
-    var play = typeof bool==="undefined"?true:bool;//是否播放滚动动画
-    if(play){
-        setTimeout(function(){
-            ball.addClass("ballmove");
-            showRectImg();
-            setTimeout(function(){
-                ball.children(".spliteBall_up").animate({top:"-110px"},700,function(){$(this).remove();}).next().animate({top:"200px"},700,function(){$(this).remove();});
-                document.cookie = "ball=true;expires=-1";
-                if(window.sessionStorage){sessionStorage.ball=true;}
-                removeBg();
-            },2000);
-        },1500);
-    }else{
-        ball.children(".spliteBall_up").remove();
-        ball.children(".spliteBall_down").remove();
-        ball.show();
-        showRectImg();
-        removeBg();
-    }
-
-    function removeBg(){
-        ball.addClass("hidebg");
-    }
-
-    function showRectImg(){
-        header.find(".profile .box img").each(function(){
-            var ts = $(this);
-            ts.attr("src",ts.attr("_src"));
-        });
-    }
-
-    var box = ball.children(".box");
-    var pto = box.find(".rect img");
-    var showpto = header.children(".showphoto");
-
-    if(!showpto.length){return false;}
-    ball.mouseleave(function(){
-        if(showpto.attr("show")==="show"){showpto.attr({show:"hide"}).hide(100);}
-    }).mousemove(function(event){
-        var x=event.clientX ,y=event.clientY;
-        showpto.css({top:y+35+"px",left:x+35+"px"});
-    });
-    pto.mousemove(function(event){
-        var x=event.clientX,y=event.clientY;
-        var src = $(this).attr("src");
-        showpto.children("img").attr({src:src});
-        showpto.show(100).attr({show:"show"}).css({top:y+35+"px",left:x+35+"px"});
-    });
-}
-//菜单栏
-function menuAction(){
-    header.on("click",".bg-t",function(){window.location.href = "/index"});
-    var menu = header.children(".menu");
-    var link = menu.children("a");
-    link.each(function(id,element){
-        element.leave = function(){
-            //鼠标移出
-            var a = $(this).removeAttr("actv");
-            if(a.is(".action")){return false;}
-            a.children("span").stop(true,false).animate({bottom:"30px"},130);
-            var pt = a.find(".action_pt");
-            if(pt.length){
-                pt.stop(true,false).animate({bottom:"-140px"},200,function(){
-                    $(this).remove();
-                    var actv = link.filter("[actv]");
-                    if(!actv.length){link.filter(".active").get(0).enter();}
-                });
-            }
-        };
-        element.enter = function(){
-            //鼠标移入
-            var actv = link.filter("[actv]");
-            if(actv.length){actv.removeAttr("actv").mouseleave();}
-            var a = $(this).attr({actv:"actv"});
-            var pt = a.find(".action_pt");
-            if(pt.length){
-                pt.stop(false,false).animate({bottom:0}, 300);
-            }else{
-                a.html(a.html()+"<i class=\"action_pt\" style='bottom: -140px'></i>");
-                a.find(".action_pt").animate({bottom:0}, 300);
-
-            }
-            var span = a.children("span");
-            span.stop(true,false);
-            span.animate({width:"100%"},170);
-            span.animate({bottom:"60px"}, 130);
-        };
-    });
-    link.mouseleave(function(){
-        this.leave();
-    }).mouseenter(function(){
-        this.enter();
-    });
-    var img = new Image();
-    img.src = "../src/public/public/menu.png";
-    img.onload = function(){link.filter(".active").get(0).enter();};
-}
 
 function Mask(str,btn,callback){
     var color = ["#232323","#000000","#505050","#404040"];
@@ -143,8 +43,10 @@ Mask.add = function(dom,parent){
     maskDom.append(dom);
     maskDom.click(function(event){
         if(event.target&&$(event.target).is(".mask")){maskDom.remove();}
+        return false;
     }).children(".addClose").click(function(){
         maskDom.remove();
+        return false;
     });
     (parent||body)['append'](maskDom);
 };
@@ -191,7 +93,7 @@ function getSessionStorage(name){
     if(window.sessionStorage&&window.sessionStorage[name]){return sessionStorage[name]}
     return false;
 }
-
+// 改变title
 function chengeTitle(){
     var OriginTitile = document.title;
     var titleTime;
@@ -385,24 +287,14 @@ function bgSnake(){
 }
 $(document).ready(function(){
 	lowIE = IEVersion();
-	menuAction();
     // content大小
     win.resize(function(){
         $("#bgcanvas").attr("width",win.width());
         $("#bgcanvas").attr("height",content.height());
     }).resize();
-	
-	if(window.sessionStorage?!getSessionStorage("ball") : !getCookie("ball")){
-		var img = new Image();
-		img.src = "../src/public/public/spliteBall.gif";
-		img.onload = jx;
-		img.onerror = jx;
-	}else{jx();}
-	
-	function jx(){
-		spliteBall(window.sessionStorage?!getSessionStorage("ball") : !getCookie("ball"));
-		var bgmDocument = document.getElementById("bgm");
-		if(lowIE){$(bgmDocument).remove();}else if(bgmDocument){bgmDocument.volume = 0.45;bgmDocument.loop = true;}
-	}
+    
+    var bgmDocument = document.getElementById("bgm");
+    if(lowIE){$(bgmDocument).remove();}else if(bgmDocument){bgmDocument.volume = 0.45;bgmDocument.loop = true;}
+
     chengeTitle();
 });

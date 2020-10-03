@@ -1,38 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>My first three.js app</title>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>反身而诚-滥觞</title>
+    <meta name="keywords" content="反身而诚,小游戏,相册,留言">
+    <meta name="description" content="反身而诚的个人空间网站,相册,留言">
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/>
 	<style>
 		body { margin: 0; }
+		#content{overflow:hidden;}
 		canvas {display:block; width: 100%; height: 100% }
 		#start{position:absolute; left:0; right:0; top:0; bottom:0; width:16px; height:16px; z-index:9; margin:auto;}
 		#start:before{content:" "; height:1px; width:100%; position:absolute; left:0; top:50%; background:#00ff00;}
 		#start:after{content:" "; width:1px; height:100%; position:absolute; left:50%; top:0; background:#00ff00;}
 		#start.instage{display:block;}
-		.help{background:rgba(0,0,0,0.2); padding:6px; margin:6px; position:absolute; left:0; top:0; z-index:9; border-radius:6px;}
+		.help{background:rgba(0,0,0,0.2); padding:6px; margin:6px; position:absolute; right:0; bottom:0; z-index:9; border-radius:6px;}
 		.help .keyrow{margin-bottom:6px; text-align:center; font-size:0;}
 		.help .keyrow .key{box-sizing:border-box; display:inline-block; width:20px; height:20px; border:1px solid #ffffff; color:#ffffff; border-radius:2px; line-height:18px; text-align:center; font-size:14px; user-select:none; margin:0 3px;}
 		.help .keyrow .key.key-b{display:block; width:auto;}
 	</style>
 </head>
 <body>
-
-<div id="start"></div>
-<div class="help">
-	<div class="keyrow">
-		<div class="key">W</div>
-	</div>
-	<div class="keyrow">
-		<div class="key">A</div>
-		<div class="key">S</div>
-		<div class="key">D</div>
-	</div>
-	<div class="keyrow">
-		<div class="key key-b">Space</div>
+<div class="menus">
+	<img src="../src/public/public/mn-0.png" class="menu" />
+	<div class="ls">
+		<a class="mn mn1" href="/three" title="滥觞"><img src="../src/public/public/mn-1.png" class="img" /></a>
+		<a class="mn mn2" href="/album" title="相册"><img src="../src/public/public/mn-2.png" class="img" /></a>
+		<a class="mn mn3" href="/notes" title="树洞"><img src="../src/public/public/mn-3.png" class="img" /></a>
 	</div>
 </div>
+<div id="content">
+	<div id="start"></div>
+	<div class="help">
+		<div class="keyrow">
+			<div class="key">W</div>
+		</div>
+		<div class="keyrow">
+			<div class="key">A</div>
+			<div class="key">S</div>
+			<div class="key">D</div>
+		</div>
+		<div class="keyrow">
+			<div class="key key-b">Space</div>
+		</div>
+	</div>
+</div>
+<audio id="bgm" autoplay></audio>
 <script src="../js/jquery-1.12.4.min.js"></script>
+<script src="../js/main.js"></script>
 <script src="../js/three.js"></script>
+<script src="../js/TDSLoader.js"></script>
 <script src="../js/lib/physi.js"></script>
 <script src="../js/Detector.js"></script>
 <script>
@@ -42,12 +65,13 @@
 	var renderer;
 	var rectLen = 100;
 	var earth = null;
+	var starBg = null;
 	var boxList = [];
 	var intersects = [];
 
 	Physijs.scripts.worker = '../js/lib/libs/physijs_worker.js';
-    Physijs.scripts.ammo = 'ammo.js';
-	
+	Physijs.scripts.ammo = 'ammo.js';
+
 	init();
 	
 	function init(){
@@ -76,8 +100,9 @@
 	function setCamera(){
 		camera = new THREE.PerspectiveCamera( 60, window.innerWidth/window.innerHeight, 0.01, 5000 );
 		camera.position.set(0,1,0);
-		camera.lookAt(new THREE.Vector3(0,1,3));
+		camera.lookAt(new THREE.Vector3(0,1,-3));
 		camera.$upSpeed = 0;
+		camera.$rx = 0;
 	}
 	
 	function obj(){
@@ -112,8 +137,20 @@
             var mesh = new THREE.Mesh( new THREE.SphereBufferGeometry(4000, 80, 80 ), new THREE.MeshBasicMaterial( { map: texture ,side: THREE.BackSide} ) );
             mesh.scale.x = -1;
 			mesh.name = "星空";
-            scene.add(mesh);
-        });
+			scene.add(mesh);
+			starBg = mesh;
+		});
+
+		var loader = new THREE.TDSLoader( );
+		loader.setResourcePath( '../src/index/_img/airship/');
+		loader.load( '../src/index/_img/airship.3ds',function(object){
+			object.scale.set(0.8,0.8,0.8);
+			object.rotation.x = Math.PI/2;
+			object.rotation.z = Math.PI/2;
+			object.position.y = -40;
+			scene.add( object );
+		} );
+				
 		boxTexture.load("../src/index/_img/diffuse.jpg",function(map){
 			ball = new THREE.SphereGeometry(200,50,50);
 			// var boxTexture = new THREE.ImageUtils.loadTexture("../src/index/_img/diffuse.jpg");
@@ -147,23 +184,28 @@
 				var sphereRestitution = 2; //反弹力
 				for(var i in data){
 					var li = data[i];
-					var boxTexture = new THREE.TextureLoader();
-					boxTexture.load(li.img,function(map){
-						var size = 4 + parseInt(Math.random()*10);
-						var geometry = new THREE.BoxBufferGeometry( size, size, size);
-						var material = new THREE.MeshBasicMaterial( {map:map, side:THREE.DoubleSide, transparent:true, opacity: 0.6} );
+					var name = li.title;
+					var href = li.href;
+					(function(name,href,noframe){
+						var boxTexture = new THREE.TextureLoader();
+						boxTexture.load(li.img,function(map){
+							var size = 4 + parseInt(Math.random()*10);
+							var geometry = new THREE.BoxBufferGeometry( size, size, size);
+							var material = new THREE.MeshBasicMaterial( {map:map, side:THREE.DoubleSide, transparent:true, opacity: 0.8} );
 
-						var cube = new Physijs.BoxMesh(geometry, new Physijs.createMaterial(material), sphereFriction, sphereRestitution);
-						cube.position.x = -60 + Math.random()*120;
-						cube.position.z = -60 + Math.random()*120;
-						cube.position.y = 40 + Math.random()*40;
-						cube.rotation.y = Math.random()*Math.PI;
-						cube.rotation.x = Math.random()*Math.PI;
-						cube.name = li.title;
-						cube.href = li.href;
-						scene.add(cube);
-						boxList.push(cube);
-					});
+							var cube = new Physijs.BoxMesh(geometry, new Physijs.createMaterial(material), sphereFriction, sphereRestitution);
+							cube.position.x = -60 + Math.random()*120;
+							cube.position.z = -60 + Math.random()*120;
+							cube.position.y = 40 + Math.random()*40;
+							cube.rotation.y = Math.random()*Math.PI;
+							cube.rotation.x = Math.random()*Math.PI;
+							cube.name = name;
+							cube.href = href;
+							cube.noframe = noframe;
+							scene.add(cube);
+							boxList.push(cube);
+						});
+					})(name,href,li.noframe)
 				}
 			        
             }
@@ -173,7 +215,7 @@
 	function render(){
 		renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
-		document.body.appendChild( renderer.domElement );
+		content.append(renderer.domElement);
 		window.addEventListener('resize', function(){
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -190,6 +232,7 @@
 		requestAnimationFrame( animate );
 		cameraMove();
 		earth && earth.move();
+		starBg && (starBg.rotation.y+=0.0005);
 		scene.simulate();
 		testClack();
 		renderer.render( scene, camera );
@@ -202,6 +245,8 @@
 		camera.$right = false;
 		camera.$jump = false;
 		camera.$upSpeed = 0;
+		camera.$rx = 0;
+		camera.$ry = 0;
 		var inmouse = false;
 		var up32 = true;
 		
@@ -226,43 +271,55 @@
 			}
 		}
 		document.onmousemove = function(e){
-			// ---------------------------
 			if(!inmouse){return false}
-			var xlen = e.movementX/200;
-			var ylen = e.movementY/200;
-			var cx = camera.rotation.x+ylen;
-			if(cx>-Math.PI/2){cx=-Math.PI/2}
-			if(cx<-Math.PI*1.5){cx=-Math.PI*1.5}
-			
-			camera.rotation.set(cx, camera.rotation.y, camera.rotation.z);
-			scene.rotation.set(scene.rotation.x, scene.rotation.y+xlen, scene.rotation.z);
+			camera.$rx += e.movementX/400;
+			camera.$ry += -e.movementY/400;
+			if(camera.$ry>Math.PI/2){camera.$ry=Math.PI/2}
+			if(camera.$ry<-Math.PI/2){camera.$ry=-Math.PI/2}
+			var a = camera.$ry;
+			var b = camera.$rx;
+
+			var vx = 10 * Math.cos(a) * Math.sin(b);
+			var vy = 10 * Math.sin(a);
+			var vz = -10 * Math.cos(a) * Math.cos(b);
+			var e = new THREE.Vector3(camera.position.x+vx , camera.position.y+vy , camera.position.z+vz);
+			camera.lookAt(e);
 		}
 		document.body.onclick = function(e){
-			console.log(inmouse);
-			inmouse = true;
-			document.body.requestPointerLock();
-			document.getElementById("start").setAttribute("class","instage");
+			if(!inmouse){
+				inmouse = true;
+				document.body.requestPointerLock();
+				document.getElementById("start").setAttribute("class","instage");
+			}else if(intersects.length){
+				camera.$up = camera.$down = camera.$left = camera.$right = false;
+				document.exitPointerLock();
+				var src = intersects[0].object.href;
+				if(intersects[0].object.noframe){
+					window.location.href = src;
+					return;
+				}
+				Mask.add("<iframe src='"+src+"' style='width:1100px;height:700px;background:#ffffff;margin:-350px 0 0 -550px;position:absolute;top:50%;left:50%;'></iframe>");
+				$(".mask iframe").focus();
+			}
 		}
 		
 		document.addEventListener('pointerlockchange', function () {
 			inmouse = document.pointerLockElement == document.body;
-			console.log(inmouse);
 		}, false);
 		
 		function jump(){
 			if(!up32 || camera.$jump){return}
 			up32 = false;
 			camera.$jump = true;
-			camera.$upSpeed=0.2; 
+			camera.$upSpeed=0.4; 
 		}
 	}
 	
 	function cameraMove(){
-		var speed = 0.05;
+		var speed = 0.06;
 		var pow2 = speed/Math.pow(2,0.5);
 		var moveP = [0,0];
 		var move = [0,0];
-		
 		switch(true){
 			case camera.$up && !camera.$left && !camera.$right: moveP=[0,speed]; break;
 			case camera.$up && camera.$left: moveP=[pow2,pow2]; break;
@@ -273,15 +330,14 @@
 			case camera.$left: moveP=[speed,0]; break;
 			case camera.$right: moveP=[-speed,0]; break;
 		}
-		
-		var r = camera.rotation.y;
+		var r = camera.$rx;
 		move[0] = -Math.sin(r)*moveP[1] + Math.cos(r)*moveP[0];
 		move[1] = Math.cos(r)*moveP[1] + Math.sin(r)*moveP[0];
-		
-		var x = camera.position.x + move[0];
-		var z = camera.position.z + move[1];
-		x = (x > rectLen/2-2 || x < rectLen/-2+2)?camera.position.x:x;
-		z = (z > rectLen/2-2 || z < rectLen/-2+2)?camera.position.z:z;
+
+		var x = camera.position.x - move[0];
+		var z = camera.position.z - move[1];
+		x = (x > rectLen/2-1 || x < rectLen/-2+1)?camera.position.x:x;
+		z = (z > rectLen/2-1 || z < rectLen/-2+1)?camera.position.z:z;
 		
 		if(camera.$jump){camera.$upSpeed -= 0.004}
 		var y = camera.position.y + (camera.$upSpeed||0);
@@ -290,7 +346,6 @@
 			camera.$upSpeed = 0;
 			y = 1;
 		}
-		
 		camera.position.set(x, y, z);
 	}
 
@@ -301,7 +356,7 @@
 		var save = intersects;
 		for(var i in save){				
 			var o = save[i].object;
-			var material = new THREE.MeshBasicMaterial({map: o.material.map, transparent:true, opacity: 0.6});
+			var material = new THREE.MeshBasicMaterial({map: o.material.map, transparent:true, opacity: 0.8});
 			o.material = material;
 		}
 		intersects = raycaster.intersectObjects(boxList);
@@ -312,5 +367,6 @@
 		}
 	}
 </script>
+<script src="../src/public/myplayer/myplayer.js"></script>
 </body>
 </html>
