@@ -478,8 +478,8 @@ function setEvent(){
         form.addClass("show");
         $(document.body).one("click",function(){form.removeClass("show")});
         return false;
-    })
-    form.on("click",function(){return false});
+    });
+    form.on("click",function(event){event.stopPropagation()});
     $(document.body).on("keyup",function(event){
         if(event && event.keyCode && event.keyCode=="82"){
             if($("#text").is(":focus") || $("#name").is(":focus")){return};
