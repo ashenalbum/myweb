@@ -220,6 +220,7 @@ var content = $("#content");
     $(function(){
         pageInit();
         bgSnake();
+        menuAction();
         if(window.sessionStorage?!getSessionStorage("ball") : !getCookie("ball")){
             var img = new Image();
             img.src = "../src/public/public/spliteBall.gif";
