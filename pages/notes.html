@@ -484,7 +484,7 @@ function setEvent(){
         if(event && event.keyCode && event.keyCode=="82"){
             if($("#text").is(":focus") || $("#name").is(":focus")){return};
             key = prompt("口令：");
-            if(key==""){return}
+            if(!key){return}
         }else{return}
         $.ajax({
             url: "../phps/getRmnoteUrl.php",

@@ -257,6 +257,7 @@ var app = new Vue({
 				if(!li.name || !li.key || li.list.length==0){alert("有空数据，请检查");return}
 			}
 			var pasword = prompt("请输入口令");
+			if(!pasword){return}
 			loadingShow();
 			$.ajax({
 				url: "../phps/changeAlbum.php",
