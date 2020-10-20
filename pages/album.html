@@ -130,9 +130,7 @@
     var meidaLocation = "../src/album/medium/";
     var fullPage = false;
     var urlPage = null;
-    $(document).on("mousewheel",function(e){
-            console.log(e)
-    })
+    
     $(function(){
         urlPage = window.location.search.match(/[\&|?]page=([^\&$]+)/);
         urlPage = urlPage && Number(urlPage[1]);
@@ -274,6 +272,7 @@
             var time = new Date().getTime();
             if(time-wheelTime<500){return false;}else{wheelTime = time}
             var up = e.originalEvent && e.originalEvent.wheelDelta;
+            if(!up){return}
             if(up<0){book.turn("next")}else{book.turn("previous")}
             return false;
         });
