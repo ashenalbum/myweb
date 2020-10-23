@@ -132,8 +132,8 @@
     var urlPage = null;
     
     $(function(){
-        urlPage = window.location.search.match(/[\&|?]page=([^\&$]+)/);
-        urlPage = urlPage && Number(urlPage[1]);
+        urlPage = window.location.hash && window.location.hash.substr(1);
+        urlPage = urlPage && Number(urlPage);
         $.ajax({
             url:"../src/album/album.json",
             // type:"post",
@@ -253,7 +253,8 @@
                     bookmark.removeClass('back');
                 }
                 nowPage = page;
-            }).bind("end",function(){
+        }).bind("end",function(){
+            window.location.hash = book.turn("page");
             var next = book.children(".next");
             var prev = book.children(".prev");
             if(book.turn("page")>=book.turn("pages")-2){next.hide()}else{next.show()}
@@ -292,7 +293,7 @@
             var goto = $(this).attr("goto")||$(this).parent().attr("goto");
             book.turn("page",parseInt(goto));
         });
-		if(urlPage){book.turn("page",parseInt(urlPage+3+1))}
+		if(urlPage){book.turn("page",parseInt(urlPage))}
         
         var mouseX = 0;
         var mouseY = 0;
