@@ -1,6 +1,6 @@
 ﻿(function(){
     var img = new Image();
-    img.src = "./model/textures/default-constume.png";
+    img.src = "/src/public/live2d/model/tia/textures/default-costume.png";
     img.onload = function(){
         var userId = (getCookie&&getCookie("userId"))?getCookie("userId"):parseInt(Math.random()*10000);
         document.cookie = "userId="+userId+";expires=Sat, 31 Jan 2099 16:00:00 GMT";
