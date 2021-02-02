@@ -1,5 +1,5 @@
 ## 我的个人主页
-地址：[ashenalbum.com](http://ashenalbum.com)
+地址：[ashen-album.top](http://ashen-album.top)
 
 
 ### 暂存
