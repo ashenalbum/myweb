@@ -31,7 +31,8 @@
         .bookbox .next:hover{background:rgba(0,0,0,0.2) url("../src/album/_book/arrows.gif") no-repeat -38px center;}
         #book .shadow{-webkit-box-shadow: 0 4px 20px #000;-moz-box-shadow: 0 4px 20px #000;-ms-box-shadow: 0 4px 20px #000;-o-box-shadow: 0 4px 20px #000;box-shadow: 0 4px 20px #000;}
         #book .page-wrapper{-webkit-perspective:2000px;-moz-perspective: 2000px;-ms-perspective: 2000px;perspective: 2000px;}
-        #book .maxPage{box-sizing: border-box; width: 100%; height: 100%; border: 16px double #333;}
+        #book .maxPage{width: 100%; height: 100%;}
+		#book .maxPage.maxPage-border{box-sizing: border-box; width: 100%; height: 100%; border: 16px double #333;}
         #book .photo{position:absolute;width:92%;height:90%;left:4%;top:5%;overflow:hidden;text-align:center; display:flex; flex-direction:column; justify-content:center;}
         #book .photo img{cursor:pointer;}
         /* #book .photo .paper{background:url(../src/album/_book/paper-bg.jpg) no-repeat; background-size:100% 100%;} */
@@ -92,7 +93,7 @@
                 <div class="bookmark" title="相册目录" ignore="1"></div>
                 <div class="hard"><img class="maxPage" src="../src/album/_book/_cover.jpg"/></div>
                 <div class="hard">
-                    <img class='maxPage' src="../src/album/_book/page.png"/>
+                    <img class='maxPage  maxPage-border' src="../src/album/_book/page.png"/>
                     <div class="gradient"></div>
                 </div>
                 <div><div class="gradient"></div>
@@ -263,7 +264,7 @@
         book.children(".bookmark").click(function(){book.turn("page",3)});
         book.turn("addPage",$("<div class='page'><div class=\"gradient\"></div><div class='endtxt' onclick='setalbum()'>但行好事<br/><i style='padding:0.5em 1em;'></i>莫问前程</div></div>"),pageLength-2);
         book.turn("addPage",$("<div class=\"hard\"><img class='maxPage' src=\"../src/album/_book/_endpage.jpg\"/></div>"),pageLength);
-        book.turn("addPage",$("<div class=\"hard\"><div class=\"gradient\"></div><img class='maxPage' src=\"../src/album/_book/theend.gif\"/></div>"),pageLength-1);
+        book.turn("addPage",$("<div class=\"hard\"><div class=\"gradient\"></div><img class='maxPage maxPage-border' src=\"../src/album/_book/theend.gif\"/></div>"),pageLength-1);
         //前后翻页
         var wheelTime = new Date().getTime();
         book.children(".next").click(function(){book.turn("next")});
@@ -293,7 +294,16 @@
             var goto = $(this).attr("goto")||$(this).parent().attr("goto");
             book.turn("page",parseInt(goto));
         });
-		if(urlPage){book.turn("page",parseInt(urlPage))}
+		
+		if(urlPage){
+			book.turn("page",parseInt(urlPage));
+			var bookmark = book.children(".bookmark");
+			if(nowPage>3){
+				bookmark.addClass('back');
+			}else if(nowPage===2||nowPage===3){
+				bookmark.removeClass('back');
+			}
+		}
         
         var mouseX = 0;
         var mouseY = 0;
