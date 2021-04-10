@@ -14,13 +14,32 @@
     <link rel="stylesheet" href="../css/live2d.css"/>
     <!-- <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/> -->
 	<style>
-        html,body{width:100%; height:100%;}
-        body{cursor:pointer; min-width:0; -webkit-tap-highlight-color:rgba(0,0,0,0); -webkit-tap-highlight-color:transparent; }
-        #content{background:#efefef url(../src/index/_img/paper-bg.jpg) repeat;}
+        html,body{width:100%; height:100%; font-family:"Microsoft YaHei","SimSun";}
+        body{background:#efefef url(../src/index/_img/paper-bg.jpg) repeat;}
+        #content{position:static;overflow-y:auto; height:100%; background:transparent!important;}
         #player{bottom:410px;}
 		.hide{display:none!important;}
         .fl{float:left;}
         .fr{float:right;}
+
+        @font-face {font-family: "iconfont";
+            src: url('iconfont.eot?t=1617950646193'); /* IE9 */
+            src: url('iconfont.eot?t=1617950646193#iefix') format('embedded-opentype'), /* IE6-IE8 */
+            url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAMgAAsAAAAABywAAALTAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDBgqCCIFwATYCJAMMCwgABCAFhG0HQRtBBsgusG3YkxK1sRACFHErDA8wFsHTfrR5u3simkzSXROtltRI2gmJBK0RIcSTiiUv4f/vWvZLrAiiisALyXQ62Gy2CGqFbiUQPY90J9zJc9QTgMzp8tOSJoEByn3i3mnTEpjPG45rLRrLPnVpFgcU0FibIiuQLkHtIV4NF3GYQKNRYcy2C8rqwFZhjQrES57TgG0upChCtl6orVlYxEc16tP7FIAP4efjP8SELUlNZk3cf5Gvh6xfcb9kqwlnPol4PgeEZWTMAYW4qHUdsYhTcyw0agpLvRLUKkKaK1r9JxTpilr7D48kiFpWfjOYIunEr1xRqoaSuz4og1rUYQe4YDG68WSl296sy+76d3v3PiZegu+XTaHc6mQIWXm1bzp4nHw2PU48xMWwc9vPp7nH+Kb6RodPz/55/kldWJlcNS1PLNVHm9mTOVFv+zN4ou1mdPSr7Mu977z8jFd/twUEd2Wo9dX2vRNg6dZ77fq8ZefzL0+yKql/nLfudL5nyjoNgQaHgB3gCqCSUZEVktd4//Dv6N1xHe50Wf5d71DA1/sPMFgp0D9HvYQg/r3injVFl1rmXFSRKzLd2UImIIEFjaiyfJ1+jtf1vEIm1OtJkdQZQVZvjFzoc6jRZBG16q2h0azC5U26UBaiNGDGLCC020TS6jOydjfkQv+BGr1+oVZ7WKDRQXRt2GQiePstijUM65F2EPE6RSaOldlHhTWYM4oampWGzAZMDXwURUdEFbOFWMZ0jimGPi6GMYIIVSRUAMdhUVSQSpUerGMR3YypKZGRpO5FETpFAntbKEyDwfQQrUEIT0chI35zxr70/hoYx0ikQVsINeEGGGXAt49EixDVg1yoknsR7uUZgz6cGAxDIASlkCAF4MBEO6VA1Pp+PTAdJkL3iIQqRSSpR/qqItbXSN+3BRpZE3KkyFHU3/AapdftJju+5WVONMrhUsYIAAA=') format('woff2'),
+            url('iconfont.woff?t=1617950646193') format('woff'),
+            url('iconfont.ttf?t=1617950646193') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+            url('iconfont.svg?t=1617950646193#iconfont') format('svg'); /* iOS 4.1- */
+        }
+
+        .iconfont {
+            font-family: "iconfont" !important;
+            font-size: 16px;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .icon-tab:before {content: "\e69f";}
+        .icon-pl:before {content: "\e634";}
 		
 		.df{display:-webkit-box; display: -webkit-flex;	display:flex; flex-flow:row;}
 		.df-c{-webkit-box-orient:vertical; -webkit-flex-flow:column; flex-flow:column;}
@@ -42,6 +61,37 @@
 		.toast.show{display:block;}
 
         .tree{position:fixed; left:0; bottom:0; width:460px; height:460px; background:url(../src/index/_img/tree.png) no-repeat left bottom; background-size:460px;}
+        #box{position:relative; width:980px; padding-left:100px; margin:0 auto; z-index:3;}
+        #box .list{width:680px; padding-top:30px; margin-right:40px;}
+        #box .tabbox{width:260px; height:400px; padding-top:30px;}
+        #box .ul .item{padding:20px 0; height:90px; border-top:1px solid #aaaaaa; cursor:pointer;}
+        #box .ul .item:last-child{border-bottom:1px solid #aaaaaa;}
+        #box .ul .item:hover .title{color:#0088bb;}
+        #box .ul .item .title{height:52px; line-height:26px; font-size:20px; }
+        #box .ul .item .img{width:117px; height:88px; border-radius:4px; margin-left:20px; background-size:cover; background-position:center; background-image:url(../src/public/public/lock.png)}
+        #box .ul .item .dtl{margin-top:18px; height:20px;}
+        #box .ul .item .dtl .iconfont{color:#99a2aa; margin-right:30px;}
+        #box .ul .item .dtl .iconfont:before{margin-right:6px; font-size:18px;}
+        #box .ul .item .dtl .iconfont:last-child{margin-right:0;}
+        #box .ul .item .dtl .tab span{display:inline-block; padding:0 3px; margin-right:4px; font-size:12px; line-height:20px; vertical-align:top; background:#999; color:#ffffff; border-radius:2px;}
+
+        .searchbox{height:34px; box-sizing:border-box; border:1px solid #999; border-radius:4px; background:rgba(255,255,255,0.3);}
+        .searchbox .input{border:none; outline:none; background:transparent; box-sizing:border-box; height:32px; width:220px; padding-left:10px; color:#666;}
+        .searchbox .searchbtn{border:none; outline:none; padding:0; width:34px; height:32px; background:transparent url(../src/index/_img/search.png) no-repeat center center; background-size:60% 60%; cursor:pointer;}
+
+        .seltabbox{margin-top:30px;}
+        .seltabbox .title{font-size:20px; padding:10px 0; border-bottom:1px solid #999999;}
+        .seltabbox .seltab{padding-top:10px;}
+        .seltabbox .seltab span{height:24px; line-height:24px; margin:0 10px 10px 0; padding:0 10px; border-radius:16px; border:thin solid #999999; cursor:pointer;}
+        .seltabbox .seltab span:hover{background:rgba(0,0,0,0.1);}
+
+        .nav{margin-top:20px; padding:10px 0; font-size:18px; font-family: "SimSun"; font-weight: bold; font-size: 22px;}
+        .nav span{cursor:pointer;}
+        .nav span:after{content:"〉"; color:#999999; padding:0 4px;}
+        .nav span:hover{color:#0088bb;}
+        .nav span:last-child:after{display:none;}
+        
+        .banner{box-sizing:border-box; padding:20px 80px 20px 100px; height:134px; background:#ffffff url(../src/index/_img/banner.jpg) no-repeat; background-size:cover; border-radius:6px;}
     </style>
 </head>
 <body>
@@ -54,6 +104,109 @@
         </div>
     </div>
     <div id="content">
+        <div id="box" class="df">
+            <div class="list">
+                <div class="banner"></div>
+                <div class="nav df ai-c">
+                    <span>全部文章</span>
+                    <span>全部文章</span>
+                </div>
+                <ul class="ul">
+                    <li class="item df">
+                        <div class="f1">
+                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
+                            <div class="dtl df">
+                                <div class=" iconfont icon-pl pl">34</div>
+                                <div class="iconfont icon-tab tab one-hide">
+                                    <span>稍等</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="img"></div>
+                    </li>
+                    <li class="item df">
+                        <div class="f1">
+                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
+                            <div class="dtl df">
+                                <div class=" iconfont icon-pl pl">34</div>
+                                <div class="iconfont icon-tab tab one-hide">
+                                    <span>稍等</span><span>稍等</span>
+                                    <span>稍等</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="img"></div>
+                    </li>
+                    <li class="item df">
+                        <div class="f1">
+                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
+                            <div class="dtl df">
+                                <div class=" iconfont icon-pl pl">34</div>
+                                <div class="iconfont icon-tab tab one-hide">
+                                    <span>稍等</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="img"></div>
+                    </li>
+                    <li class="item df">
+                        <div class="f1">
+                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
+                            <div class="dtl df">
+                                <div class=" iconfont icon-pl pl">34</div>
+                                <div class="iconfont icon-tab tab one-hide">
+                                    <span>稍等</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="img"></div>
+                    </li>
+                    <li class="item df">
+                        <div class="f1">
+                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
+                            <div class="dtl df">
+                                <div class=" iconfont icon-pl pl">34</div>
+                                <div class="iconfont icon-tab tab one-hide">
+                                    <span>稍等</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="img"></div>
+                    </li>
+                    <li class="item df">
+                        <div class="f1">
+                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
+                            <div class="dtl df">
+                                <div class=" iconfont icon-pl pl">34</div>
+                                <div class="iconfont icon-tab tab one-hide">
+                                    <span>稍等</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="img"></div>
+                    </li>
+                </ul>
+                <div class="pagesbox">
+
+                </div>
+            </div>
+            <div class="tabbox">
+                <form id="searchfrom" class="searchbox df ai-c just-c-bet">
+                    <input class="input" maxlength="12" type="text" placeholder="搜索文章" />
+                    <button class="searchbtn"></button>
+                </form>
+                <div class="seltabbox">
+                    <div class="title">选择标签</div>
+                    <div class="seltab df df-w-w">
+                        <span>标签</span>
+                        <span>阿斯顿发生</span>
+                        <span>气温仍然哇哇</span>
+                        <span>气哇</span>
+                        <span>气温仍</span>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="tree"></div>
     </div>
 	<div id="toast" class="toast"></div>
@@ -65,6 +218,15 @@ $(function(){
 	getData();
 });
 
+function setEvent(){
+    $("#searchfrom").submit(function(){
+        return false;
+    });
+}
+
+function getData(){
+
+}
 </script>
 <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1273638543'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273638543%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
 </body>
