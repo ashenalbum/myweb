@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <link rel="icon" href="/_ashen.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>反身而诚-收藏</title>
+    <meta name="keywords" content="反身而诚,小游戏,相册,留言">
+    <meta name="description" content="反身而诚的个人空间网站,相册,留言">
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/live2d.css"/>
+    <!-- <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/> -->
+	<style>
+        html,body{width:100%; height:100%; font-family:"Microsoft YaHei","SimSun";}
+        body{background:#efefef url(../src/index/_img/paper-bg.jpg) repeat;}
+        #content{position:static; overflow-y:auto; height:100%; background:transparent!important;}
+        #player{bottom:410px;}
+		.hide{display:none!important;}
+        .fl{float:left;}
+        .fr{float:right;}
+
+        @font-face {font-family: "iconfont";
+            src: url('iconfont.eot?t=1617950646193'); /* IE9 */
+            src: url('iconfont.eot?t=1617950646193#iefix') format('embedded-opentype'), /* IE6-IE8 */
+            url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAMgAAsAAAAABywAAALTAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDBgqCCIFwATYCJAMMCwgABCAFhG0HQRtBBsgusG3YkxK1sRACFHErDA8wFsHTfrR5u3simkzSXROtltRI2gmJBK0RIcSTiiUv4f/vWvZLrAiiisALyXQ62Gy2CGqFbiUQPY90J9zJc9QTgMzp8tOSJoEByn3i3mnTEpjPG45rLRrLPnVpFgcU0FibIiuQLkHtIV4NF3GYQKNRYcy2C8rqwFZhjQrES57TgG0upChCtl6orVlYxEc16tP7FIAP4efjP8SELUlNZk3cf5Gvh6xfcb9kqwlnPol4PgeEZWTMAYW4qHUdsYhTcyw0agpLvRLUKkKaK1r9JxTpilr7D48kiFpWfjOYIunEr1xRqoaSuz4og1rUYQe4YDG68WSl296sy+76d3v3PiZegu+XTaHc6mQIWXm1bzp4nHw2PU48xMWwc9vPp7nH+Kb6RodPz/55/kldWJlcNS1PLNVHm9mTOVFv+zN4ou1mdPSr7Mu977z8jFd/twUEd2Wo9dX2vRNg6dZ77fq8ZefzL0+yKql/nLfudL5nyjoNgQaHgB3gCqCSUZEVktd4//Dv6N1xHe50Wf5d71DA1/sPMFgp0D9HvYQg/r3injVFl1rmXFSRKzLd2UImIIEFjaiyfJ1+jtf1vEIm1OtJkdQZQVZvjFzoc6jRZBG16q2h0azC5U26UBaiNGDGLCC020TS6jOydjfkQv+BGr1+oVZ7WKDRQXRt2GQiePstijUM65F2EPE6RSaOldlHhTWYM4oampWGzAZMDXwURUdEFbOFWMZ0jimGPi6GMYIIVSRUAMdhUVSQSpUerGMR3YypKZGRpO5FETpFAntbKEyDwfQQrUEIT0chI35zxr70/hoYx0ikQVsINeEGGGXAt49EixDVg1yoknsR7uUZgz6cGAxDIASlkCAF4MBEO6VA1Pp+PTAdJkL3iIQqRSSpR/qqItbXSN+3BRpZE3KkyFHU3/AapdftJju+5WVONMrhUsYIAAA=') format('woff2'),
+            url('iconfont.woff?t=1617950646193') format('woff'),
+            url('iconfont.ttf?t=1617950646193') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+            url('iconfont.svg?t=1617950646193#iconfont') format('svg'); /* iOS 4.1- */
+        }
+
+        .iconfont {
+            font-family: "iconfont" !important;
+            font-size: 16px;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .icon-tab:before {content: "\e69f";}
+        .icon-pl:before {content: "\e634";}
+		
+		.df{display:-webkit-box; display: -webkit-flex;	display:flex; flex-flow:row;}
+		.df-c{-webkit-box-orient:vertical; -webkit-flex-flow:column; flex-flow:column;}
+		.fc,.f1{-webkit-box-flex:1; -webkit-flex:1; flex:1;}
+		.ai-s{align-items:flex-start;}
+		.ai-c{align-items:center;}
+		.ai-e{align-items:flex-end;}
+		.just-c-sta{justify-content: start;}
+		.just-c-end{justify-content: flex-end;}
+		.just-c-bet{justify-content:space-between;}
+		.just-c-ct{justify-content:center;}
+		.just-c-aro{justify-content:space-around;}
+		.df-w-w{flex-wrap:wrap; align-content:flex-start}
+		.one-hide{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:1; overflow:hidden; text-overflow:ellipsis;}
+		.two-hide{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; text-overflow:ellipsis;}
+		.three-hide{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; text-overflow:ellipsis;}
+
+		.toast{display:none; position:absolute; bottom:50px; left:50%; transform: translateX(-50%); padding:16px; border-radius:10px; line-height:22px; font-size:16px; text-align:center; background:rgba(0,0,0,0.5); color:#ffffff; z-index:999;}
+		.toast.show{display:block;}
+
+        .tree{position:fixed; left:0; bottom:0; width:460px; height:460px; background:url(../src/index/_img/tree.png) no-repeat left bottom; background-size:460px;}
+
+        #editbox{position:relative; padding-top:40px; padding-bottom:20px; width:980px; margin:0 auto; font-size:16px;}
+        /* #editbox ol,
+        #editbox ul{display: block; list-style-type: decimal; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; padding-inline-start: 40px;} */
+        #editbox ul,
+        #editbox ol{padding-inline-start: 40px; list-style: inherit;}
+        #editbox ul li,
+        #editbox ol li{list-style: inherit;}
+        #editbox .ck-content {min-height: 500px;}
+        #editbox .ck.ck-editor__main>.ck-editor__editable{background:#ffffff url(../src/public/public/gezi.png) repeat center center;}
+
+        
+        :root{--ck-inner-shadow:none!important;}
+        .ck-focused{border:1px solid #c4c4c4!important; }
+    </style>
+</head>
+<body>
+    <div class="menus">
+        <img src="../src/public/public/mn-0.png" class="menu" />
+        <div class="ls">
+            <a class="mn mn1" href="/essay" title="滥觞"><img src="../src/public/public/mn-4.png" class="img" /></a>
+            <a class="mn mn2" href="/album" title="相册"><img src="../src/public/public/mn-2.png" class="img" /></a>
+            <a class="mn mn3" href="/notes" title="树洞"><img src="../src/public/public/mn-3.png" class="img" /></a>
+        </div>
+    </div>
+    <div id="content">
+        <div class="tree"></div>
+        <div id="editbox">
+            <div id="editcont"></div>
+        </div>
+    </div>
+	<div id="toast" class="toast"></div>
+<script type="text/javascript" src="../js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../js/main.js"></script>
+<script type="text/javascript" src="../js/ckeditor/ckeditor.js"></script>
+<!-- <script type="text/javascript" src="../js/ckeditor/translations/zh-cn.js"></script> -->
+<script type="text/javascript">
+$(function(){
+	setEvent();
+	init();
+});
+
+function setEvent(){
+}
+
+function init(){
+    ClassicEditor.create( document.querySelector( '#editcont' ), {
+        language: 'zh-cn',
+        toolbar: {
+            items: [
+                'heading', '|',
+                'alignment', 'bold', 'italic', 'fontBackgroundColor', 'fontColor', 'fontSize', 'removeFormat', '|',
+                'link', 'imageInsert', 'mediaEmbed', 'insertTable', 'bulletedList', 'numberedList', '|',
+                'undo', 'redo'
+            ]
+        },
+        mediaEmbed: {
+            providers: [{
+                name: 'myprovider',
+                url: [
+                    /^https?:\/\/.+\.mp4$/,
+                    /^https?:\/\/.+\.mp3$/
+                ],
+                html: match => {
+                    const input = match['input'];
+                    if(/\.mp4$/.test(input)){
+                        return '<video src="'+ input +'" controls></video>';
+                    }else{
+                        return '<audio src="'+ input +'" controls></audio>';
+                    }
+                }
+            }]
+        }
+    }).then( editor => {
+        $(document.head).append('<style>#editbox .ck-content{min-height:800px!important;}</style>');
+        editor.plugins.get('FileRepository').createUploadAdapter = function(loader){
+            return {
+                upload(){
+                    return new Promise(function(resolve, reject){
+                        var data = new FormData();
+                        loader.file.then(function(res){
+                            var file = res;
+                            data.append('file', file);
+                            data.append('pwd', prompt("口令:"));
+                            $.ajax({
+							    url: '/phps/articleFile.php', //后端的上传接口 
+							    type: 'POST',
+							    data: data,
+							    dataType: 'json',
+							    processData: false,
+							    contentType: false,
+							    success: function (data) {
+							        if (data && data.code == 0) {
+							            resolve({
+							                default: data.default //后端返回的参数 【注】返回参数格式是{code:0,default:'http://xxx.com'}
+							            });
+							        } else {
+							            reject(data.msg);
+							        }
+							    }
+							});
+                        });
+                    });
+                }
+            }
+        };
+        window.editor = editor;
+    }).catch( error => {
+        console.error( 'Oops, something went wrong!' );
+        console.error( 'Please, report the following error on https://github.com/ckeditor/ckeditor5/issues with the build id and the error stack trace:' );
+        console.warn( 'Build id: 9trbpiozgio2-ifl4i6b2gpvb' );
+        console.error( error );
+    });
+}
+</script>
+</body>
+</html>
