@@ -43,7 +43,7 @@ Mask.add = function(dom,parent){
     maskDom.append(dom);
     maskDom.click(function(event){
         if(event.target&&$(event.target).is(".mask")){maskDom.remove();}
-        return false;
+        event.stopPropagation();
     }).children(".addClose").click(function(){
         maskDom.remove();
         return false;
@@ -298,3 +298,11 @@ $(document).ready(function(){
 
     chengeTitle();
 });
+
+
+function toast(txt){
+	var toastdom = $(document.body).children("#toast");
+	if(!toastdom.length){alert(txt);return}
+	toastdom.addClass("show").text(txt);
+	setTimeout(function(){toastdom.removeClass('show')},1600);
+}

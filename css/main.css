@@ -46,6 +46,8 @@ p{word-wrap:break-word}
 .mask .box .btns input[type='button']{margin:0 30px;min-width:100px;height:36px;border:none;border-radius:5px;font-size:18px;cursor:pointer;}
 .mask .box .btns input[type='button']:hover{border:1px solid #5555ff;}
 .mask .box .btns input[type='button']:focus{outline:none;}
+
+.toast{display:none; position:absolute; bottom:50px; left:50%; transform: translateX(-50%); padding:16px; border-radius:10px; line-height:22px; font-size:16px; text-align:center; background:rgba(0,0,0,0.5); color:#ffffff; z-index:999;}
+.toast.show{display:block;}
 /* 流量统计 */
 #cnzz_stat_icon_1273638543{position:absolute;z-index:3;right:0;bottom:0;}
-

@@ -57,9 +57,6 @@
 		.two-hide{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; text-overflow:ellipsis;}
 		.three-hide{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; text-overflow:ellipsis;}
 
-		.toast{display:none; position:absolute; bottom:50px; left:50%; transform: translateX(-50%); padding:16px; border-radius:10px; line-height:22px; font-size:16px; text-align:center; background:rgba(0,0,0,0.5); color:#ffffff; z-index:999;}
-		.toast.show{display:block;}
-
         .tree{position:fixed; left:0; bottom:0; width:460px; height:460px; background:url(../src/index/_img/tree.png) no-repeat left bottom; background-size:460px;}
         #box{position:relative; width:980px; padding-left:100px; margin:0 auto; z-index:3;}
         #box .list{width:680px; padding-top:30px; margin-right:40px;}
@@ -82,7 +79,7 @@
         .seltabbox{margin-top:30px;}
         .seltabbox .title{font-size:20px; padding:10px 0; border-bottom:1px solid #999999;}
         .seltabbox .seltab{padding-top:10px;}
-        .seltabbox .seltab span{height:24px; line-height:24px; margin:0 10px 10px 0; padding:0 10px; border-radius:16px; border:thin solid #999999; cursor:pointer;}
+        .seltabbox .seltab span{height:28px; line-height:28px; margin:0 10px 10px 0; padding:0 12px; border-radius:16px; border:thin solid #999999; cursor:pointer;}
         .seltabbox .seltab span:hover{background:rgba(0,0,0,0.1);}
 
         .nav{margin-top:20px; padding:10px 0; font-size:18px; font-family: "SimSun"; font-weight: bold; font-size: 22px;}
@@ -91,7 +88,7 @@
         .nav span:hover{color:#0088bb;}
         .nav span:last-child:after{display:none;}
         
-        .banner{box-sizing:border-box; padding:20px 80px 20px 100px; height:134px; background:#ffffff url(../src/index/_img/banner.jpg) no-repeat; background-size:cover; border-radius:6px;}
+        .banner{box-sizing:border-box; display:block; padding:20px 80px 20px 100px; height:134px; background:#ffffff url(../src/index/_img/banner.jpg) no-repeat; background-size:cover; border-radius:6px;}
     </style>
 </head>
 <body>
@@ -106,7 +103,7 @@
     <div id="content">
         <div id="box" class="df">
             <div class="list">
-                <div class="banner"></div>
+                <a class="banner" href="/pages/essay_create.html" target="_blank"></a>
                 <div class="nav df ai-c">
                     <span>全部文章</span>
                     <span>全部文章</span>
@@ -197,13 +194,7 @@
                 </form>
                 <div class="seltabbox">
                     <div class="title">选择标签</div>
-                    <div class="seltab df df-w-w">
-                        <span>标签</span>
-                        <span>阿斯顿发生</span>
-                        <span>气温仍然哇哇</span>
-                        <span>气哇</span>
-                        <span>气温仍</span>
-                    </div>
+                    <div id="seltab" class="seltab df df-w-w"></div>
                 </div>
             </div>
         </div>
@@ -213,6 +204,8 @@
 <script type="text/javascript" src="../js/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../js/main.js"></script>
 <script type="text/javascript">
+var seltab = $("#seltab");
+
 $(function(){
 	setEvent();
 	getData();
@@ -225,7 +218,19 @@ function setEvent(){
 }
 
 function getData(){
-
+    $.ajax({
+        url: "/phps/article/getLabels.php",
+        dataType: "json",
+        success(data){
+            if(data && data.arr && data.arr.length){
+                seltab.empty();
+                for(var i in data.arr){
+                    var o = data.arr[i];
+                    seltab.append('<span data-id="'+ o.id +'">'+ o.text +'</span>');
+                }
+            }
+        }
+    });
 }
 </script>
 <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1273638543'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273638543%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
