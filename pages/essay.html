@@ -11,8 +11,6 @@
     <meta name="keywords" content="反身而诚,小游戏,相册,留言">
     <meta name="description" content="反身而诚的个人空间网站,相册,留言">
     <link rel="stylesheet" href="../css/main.css" />
-    <link rel="stylesheet" href="../css/live2d.css"/>
-    <!-- <link rel="stylesheet" href="../src/public/myplayer/myplayer.css"/> -->
 	<style>
         html,body{width:100%; height:100%; font-family:"Microsoft YaHei","SimSun";}
         body{background:#efefef url(../src/index/_img/paper-bg.jpg) repeat;}
@@ -57,20 +55,29 @@
 		.two-hide{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; text-overflow:ellipsis;}
 		.three-hide{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; text-overflow:ellipsis;}
 
-        .tree{position:fixed; left:0; bottom:0; width:460px; height:460px; background:url(../src/index/_img/tree.png) no-repeat left bottom; background-size:460px;}
+        .tree{position:fixed; opacity:0.6; left:0; bottom:0; width:460px; height:460px; background:url(../src/index/_img/tree.png) no-repeat left bottom; background-size:460px;}
         #box{position:relative; width:980px; padding-left:100px; margin:0 auto; z-index:3;}
         #box .list{width:680px; padding-top:30px; margin-right:40px;}
         #box .tabbox{width:260px; height:400px; padding-top:30px;}
-        #box .ul .item{padding:20px 0; height:90px; border-top:1px solid #aaaaaa; cursor:pointer;}
+        #box .ul .item{padding:20px 0; height:90px; border-top:1px solid #aaaaaa; cursor:pointer; color:inherit; }
         #box .ul .item:last-child{border-bottom:1px solid #aaaaaa;}
         #box .ul .item:hover .title{color:#0088bb;}
         #box .ul .item .title{height:52px; line-height:26px; font-size:20px; }
-        #box .ul .item .img{width:117px; height:88px; border-radius:4px; margin-left:20px; background-size:cover; background-position:center; background-image:url(../src/public/public/lock.png)}
+        #box .ul .item .img{width:117px; height:88px; border-radius:4px; margin-left:20px; background-size:cover; background-position:center; background-image:url(../src/index/_img/nocover.jpg)}
         #box .ul .item .dtl{margin-top:18px; height:20px;}
+        #box .ul .item .dtl .time{font-size:14px; color:#888888; margin-right:20px;}
         #box .ul .item .dtl .iconfont{color:#99a2aa; margin-right:30px;}
         #box .ul .item .dtl .iconfont:before{margin-right:6px; font-size:18px;}
         #box .ul .item .dtl .iconfont:last-child{margin-right:0;}
-        #box .ul .item .dtl .tab span{display:inline-block; padding:0 3px; margin-right:4px; font-size:12px; line-height:20px; vertical-align:top; background:#999; color:#ffffff; border-radius:2px;}
+        #box .ul .item .dtl .tab span{display:inline-block; padding:0 5px; margin-right:4px; font-size:12px; line-height:20px; vertical-align:top; background:#b0b0b0; color:#ffffff; border-radius:2px;}
+        #box .ul .nodata{text-align:center; padding:30px; font-size:18px; color:#999999;}
+
+        #box .pagesbox{margin-top:40px; width:100%;height:30px; text-align:center; user-select:none;}
+        #box .pagesbox a{line-height: 30px;margin: 0 8px;background: #ffffff;padding: 5px 12px;cursor:pointer;vertical-align: middle;}
+        #box .pagesbox a:hover{outline:2px solid #000000;}
+        #box .pagesbox .active{background:#000000;color:#ffffff;}
+        #box .pagesbox span{line-height:30px;padding: 5px 12px;cursor: pointer;vertical-align: middle;font-size:12px;color: #666;}
+        #box .loading{opacity:0.5;}
 
         .searchbox{height:34px; box-sizing:border-box; border:1px solid #999; border-radius:4px; background:rgba(255,255,255,0.3);}
         .searchbox .input{border:none; outline:none; background:transparent; box-sizing:border-box; height:32px; width:220px; padding-left:10px; color:#666;}
@@ -79,10 +86,11 @@
         .seltabbox{margin-top:30px;}
         .seltabbox .title{font-size:20px; padding:10px 0; border-bottom:1px solid #999999;}
         .seltabbox .seltab{padding-top:10px;}
-        .seltabbox .seltab span{height:28px; line-height:28px; margin:0 10px 10px 0; padding:0 12px; border-radius:16px; border:thin solid #999999; cursor:pointer;}
-        .seltabbox .seltab span:hover{background:rgba(0,0,0,0.1);}
+        .seltabbox .seltab .lb{height:28px; line-height:28px; margin:0 10px 10px 0; padding:0 12px; border-radius:16px; border:thin solid #999999; cursor:pointer;}
+        .seltabbox .seltab .lb:hover{background:rgba(0,0,0,0.1);}
+        .seltabbox .seltab .lb.active{background:#0088bb; border-color:#0088bb; color:#ffffff;}
 
-        .nav{margin-top:20px; padding:10px 0; font-size:18px; font-family: "SimSun"; font-weight: bold; font-size: 22px;}
+        .nav{margin-top:20px; padding:10px 0; font-size:18px;}
         .nav span{cursor:pointer;}
         .nav span:after{content:"〉"; color:#999999; padding:0 4px;}
         .nav span:hover{color:#0088bb;}
@@ -104,88 +112,11 @@
         <div id="box" class="df">
             <div class="list">
                 <a class="banner" href="/pages/essay_create.html" target="_blank"></a>
-                <div class="nav df ai-c">
-                    <span>全部文章</span>
-                    <span>全部文章</span>
+                <div id="nav" class="nav df ai-c">
+                    <span class="all">全部文章</span>
                 </div>
-                <ul class="ul">
-                    <!-- <li class="item df">
-                        <div class="f1">
-                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
-                            <div class="dtl df">
-                                <div class=" iconfont icon-pl pl">34</div>
-                                <div class="iconfont icon-tab tab one-hide">
-                                    <span>稍等</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="img"></div>
-                    </li>
-                    <li class="item df">
-                        <div class="f1">
-                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
-                            <div class="dtl df">
-                                <div class=" iconfont icon-pl pl">34</div>
-                                <div class="iconfont icon-tab tab one-hide">
-                                    <span>稍等</span><span>稍等</span>
-                                    <span>稍等</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="img"></div>
-                    </li>
-                    <li class="item df">
-                        <div class="f1">
-                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
-                            <div class="dtl df">
-                                <div class=" iconfont icon-pl pl">34</div>
-                                <div class="iconfont icon-tab tab one-hide">
-                                    <span>稍等</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="img"></div>
-                    </li>
-                    <li class="item df">
-                        <div class="f1">
-                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
-                            <div class="dtl df">
-                                <div class=" iconfont icon-pl pl">34</div>
-                                <div class="iconfont icon-tab tab one-hide">
-                                    <span>稍等</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="img"></div>
-                    </li>
-                    <li class="item df">
-                        <div class="f1">
-                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
-                            <div class="dtl df">
-                                <div class=" iconfont icon-pl pl">34</div>
-                                <div class="iconfont icon-tab tab one-hide">
-                                    <span>稍等</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="img"></div>
-                    </li>
-                    <li class="item df">
-                        <div class="f1">
-                            <div class="title two-hide">剧场版『名侦探柯南 绯色的子弹』中国内地正式定档4月17日上映绯色的子弹』中国内地正式定档4月17日上映 </div>
-                            <div class="dtl df">
-                                <div class=" iconfont icon-pl pl">34</div>
-                                <div class="iconfont icon-tab tab one-hide">
-                                    <span>稍等</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="img"></div>
-                    </li> -->
-                </ul>
-                <div class="pagesbox">
-
-                </div>
+                <div id="ul" class="ul"></div>
+                <div class="pagesbox"></div>
             </div>
             <div class="tabbox">
                 <form id="searchfrom" class="searchbox df ai-c just-c-bet">
@@ -204,20 +135,59 @@
 <script type="text/javascript" src="../js/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../js/main.js"></script>
 <script type="text/javascript">
+var ul = $("#ul");
+var nav = $("#nav");
 var seltab = $("#seltab");
+var pagesDom = $("#box>.list>.pagesbox");
+var labelObj = {};
+var lbsc = '';
+var limit = 32;
 
 $(function(){
 	setEvent();
+    init();
 	getData();
 });
 
 function setEvent(){
+    pagesDom.on("click","a",function(){
+        var ts = $(this);
+        if(ts.hasClass("loading")){return false;}
+        var atPage = ts.data("goto");
+        ts.addClass("loading");
+        getData(atPage,function(b){
+            ts.removeClass("loading").addClass("active");
+        });
+    });
     $("#searchfrom").submit(function(){
+        lbsc = '';
+        $("#seltab .lb.active").removeClass("active");
+        getData(0);
+        if(nav.find(".sub").length){nav.find(".sub").remove();}
+        nav.append('<span class="sub">“'+ $(this).find(".input").val() +'”</span>');
         return false;
+    });
+    $("#seltab").on("click",".lb", function(){
+        var ts = $(this);
+        ts.siblings(".active").removeClass("active");
+        ts.addClass("active");
+        var id = ts.data('id');
+        $("#searchfrom .input").val('');
+        lbsc = id;
+        getData(0);
+        if(nav.find(".sub").length){nav.find(".sub").remove();}
+        nav.append('<span class="sub">分类：'+ts.html()+'</span>');
+    });
+    $("#nav .all").click(function(){
+        lbsc = '';
+        $("#seltab .lb.active").removeClass("active");
+        $("#searchfrom .input").val('');
+        getData(0);
+        if(nav.find(".sub").length){nav.find(".sub").remove();}
     });
 }
 
-function getData(){
+function init(){
     $.ajax({
         url: "/phps/article/getLabels.php",
         dataType: "json",
@@ -226,12 +196,78 @@ function getData(){
                 seltab.empty();
                 for(var i in data.arr){
                     var o = data.arr[i];
-                    seltab.append('<span data-id="'+ o.id +'">'+ o.text +'</span>');
+                    seltab.append('<span class="lb" data-id="'+ o.id +'">'+ o.text +'</span>');
+                    labelObj[o.id] = o.text;
                 }
             }
         }
     });
 }
+
+function getData(page, callback){
+    var search = $("#searchfrom .input").val();
+    $.ajax({
+        url: "/phps/article/search.php",
+        type: "get",
+        dataType: "json",
+        data: {search:search, label:lbsc, page:page||0, limit:limit},
+        success(data){
+            ul.empty();
+            if(data.arr && data.arr.length){
+                for(var i in data.arr){
+                    var o = data.arr[i];
+                    var lbspan = "";
+                    for(var lb in o.label){
+                        if(labelText(o.label[lb])){
+                            lbspan += '<span>'+ labelText(o.label[lb]) +'</span>';
+                        }
+                    }
+                    ul.append('<a href="/essay_detail?id='+ o.id +'" target="_blandk" class="item df">'+
+                        '<div class="f1">'+
+                            '<div class="title two-hide">'+ o.title +'</div>'+
+                            '<div class="dtl df">'+
+                                '<div class="time">'+ o.addtime +'</div>'+
+                                '<div class="iconfont icon-tab tab one-hide">'+ lbspan +'</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="img" '+ (o.cover?'style="background-image:url('+ o.cover +')"':'') +'></div>'+
+                    '</a>');
+                }
+                pagesDom.html("");
+                setPageButton(page||0, data.pages, Number(data.len));
+            }else{
+                pagesDom.html("");
+                setPageButton(0, 0, 0);
+                ul.html('<li class="nodata">暂无数据</li>');
+            }
+            callback && callback()
+        },
+        error(){toast("请求失败")}
+    });
+}
+
+function labelText(id){return labelObj[id] || false;}
+
+function setPageButton(page,pages,len){
+    if(len<=limit){return}
+    if(pages<10){
+        for(var i=0;i<pages;i++){
+            pagesDom.append("<a "+(i==page?"class='active'":"")+" data-goto='"+i+"'>"+(i+1)+"</a>");
+        }
+    }else{
+        for(var i=0; i<7; i++){
+            if(page<=3){
+                pagesDom.append("<a "+(page==i?"class='active'":"")+" data-goto='"+i+"'>"+(i+1)+"</a>");
+            }else if(page+4>=pages){
+                pagesDom.append("<a "+(page==(pages-7+i)?"class='active'":"")+" data-goto='"+(pages-7+i)+"'>"+(pages-6+i)+"</a>");
+            }else{
+                pagesDom.append("<a "+(i==3?"class='active'":"")+" data-goto='"+(page-3+i)+"'>"+(page-3+i+1)+"</a>");
+            }
+        }
+    }
+    pagesDom.append("<span>共 "+pages+" 页 "+len+" 条</span>").find("a.active");
+}
+
 </script>
 <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1273638543'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273638543%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
 </body>

@@ -2,14 +2,16 @@
 
 $query = $_SERVER['QUERY_STRING'];
 
-switch($query){
-    case "": require "pages/album.html"; break;
-    case "/essay":require "pages/essay.html";break;
-    case "/three":require "pages/three.html";break;
-    case "/album":require "pages/album.html";break;
-    case "/album_set_provite":require "pages/album_set.html";break;
-    case "/notes":require "pages/notes.html";break;
-    default:require "src/404/404.html";
+if($query==""){
+    require "pages/album.html";
+}else{
+    $len = preg_match_all('/^\/([a-zA-Z0-9\-_]+)\??(.+)?$/', $query, $matches);
+    $pagepath = "pages/".$matches[1][0].".html";
+    if($len>0 && file_exists($pagepath)){
+        require $pagepath;
+    }else{
+        require "src/404/404.html";
+    }
 }
 
 ?>

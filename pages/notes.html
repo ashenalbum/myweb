@@ -181,6 +181,7 @@
 var removeUrl = "";
 var key = "";
 var form = $("#form");
+var pagesDom = $("#pages");
 
 $(function(){
     icon();
@@ -220,20 +221,20 @@ function notes(){
                     // d.text = d.text.replace(/\n/g,"<br/>");
                     // d.text = d.text.replace(/\s/g,"&nbsp;&nbsp;");
                     var tab = $("<div class='my-tab style"+(d&&d.style)+"'>" +
-                                "<div myid='"+d.index+"' class='delete "+(removeUrl?'show':'')+"'>&times;</div>"+
-                                "<div class='bg-top'></div> " +
-                                "<div class='bg-cont'>" +
-                                    "<div class='tab-title'>" +
-                                        "<i class='icon fl' iconid='"+ d.icon+"' />" +
-                                        "<span class=\"name fl\">"+d.name+"</span>"+
-                                        "<span class=\"id fr\">"+d.id+"F</span>"+
-                                    "</div>"+
-                                    "<p class=\"word\">"+d.text+"</p>" +
-                                "</div>" +
-                                "<div class='bg-btm'>" +
-                                    "<div class='date'>"+d.date+"</div>"+
-                                "</div> " +
-                            "</div>");
+                        "<div myid='"+d.index+"' class='delete "+(removeUrl?'show':'')+"'>&times;</div>"+
+                        "<div class='bg-top'></div> " +
+                        "<div class='bg-cont'>" +
+                            "<div class='tab-title'>" +
+                                "<i class='icon fl' iconid='"+ d.icon+"' />" +
+                                "<span class=\"name fl\">"+d.name+"</span>"+
+                                "<span class=\"id fr\">"+d.id+"F</span>"+
+                            "</div>"+
+                            "<p class=\"word\">"+d.text+"</p>" +
+                        "</div>" +
+                        "<div class='bg-btm'>" +
+                            "<div class='date'>"+d.date+"</div>"+
+                        "</div> " +
+                    "</div>");
                     if (d.icon == 99) {
                         tab.find(".icon").addClass("me").attr("title","反身而诚专属头像");
                     }else{
@@ -249,7 +250,7 @@ function notes(){
                 }
 
                 $("#pages").html("");
-                setPageButton(activePage,message.pages,message.len);
+                setPageButton(getpage,message.pages,message.len);
                 if(callback){callback(true)}
             },
             error:function(error){
@@ -278,41 +279,32 @@ function notes(){
     //设置分页按钮
     function setPageButton(page,pages,len){
         if(len<=setPageLen){return}
-        var pageDom = $("#pages");
         if(pages<10){
             for(var i=0;i<pages;i++){
-                pageDom.append("<a "+(i==page?"class='active'":"")+" goto='"+i+"'>"+(i+1)+"</a>");
+                pagesDom.append("<a "+(i==page?"class='active'":"")+" data-goto='"+i+"'>"+(i+1)+"</a>");
             }
         }else{
-            if(page+3>=pages){
-                for(var i=0;i<7;i++){
-                    pageDom.append("<a "+(page==(pages-7+i)?"class='active'":"")+" goto='"+(pages-7+i)+"'>"+(pages-6+i)+"</a>");
-                }
-            }else{
-                var b = 7;
-                for(var i=0;i<b;i++){
-                    if(page-3+i<=0){b++;continue;}
-                    pageDom.append("<a "+(i==4?"class='active'":"")+" goto='"+(page-4+i)+"'>"+(page-3+i)+"</a>");
+            for(var i=0; i<7; i++){
+                if(page<=3){
+                    pagesDom.append("<a "+(page==i?"class='active'":"")+" data-goto='"+i+"'>"+(i+1)+"</a>");
+                }else if(page+4>=pages){
+                    pagesDom.append("<a "+(page==(pages-7+i)?"class='active'":"")+" data-goto='"+(pages-7+i)+"'>"+(pages-6+i)+"</a>");
+                }else{
+                    pagesDom.append("<a "+(i==3?"class='active'":"")+" data-goto='"+(page-3+i)+"'>"+(page-3+i+1)+"</a>");
                 }
             }
         }
-        pageDom.append("<span>共 "+pages+" 页， "+len+" 条</span>").find("a.active");
+        pagesDom.append("<span>共 "+pages+" 页 "+len+" 条</span>").find("a.active");
     }
 
-    $("#pages").click(pagesClick);
-
-    function pagesClick(){
-        var target = $(event.target);
-        if(target.is("a")){
-            activePage = parseInt(target.attr("goto"));
-            var n = activePage * setPageLen;
-            var ts = $(this);
-            ts.addClass("loading").unbind();
-            getData(n,function(b){
-                ts.removeClass("loading").click(pagesClick);
-            });
-        }
-    }
+    pagesDom.on("click","a",function(){
+        var ts = $(this);
+        if(ts.hasClass("loading")){return false;}
+        var atPage = ts.data("goto");
+        activePage = atPage;
+        ts.addClass("loading");
+        getData(atPage);
+    });
 
     $("#text").bind("input propertychange",function(){
         $("#form .length .nowleng").html(" "+$(this).val().length+" ");

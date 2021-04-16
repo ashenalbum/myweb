@@ -11,7 +11,6 @@
     <meta name="keywords" content="反身而诚,小游戏,相册,留言">
     <meta name="description" content="反身而诚的个人空间网站,相册,留言">
     <link rel="stylesheet" href="../css/main.css" />
-    <link rel="stylesheet" href="../css/live2d.css"/>
     <link rel="stylesheet" href="../css/CKEditor.css"/>
 	<style>
         html,body{width:100%; height:100%; font-family:"Microsoft YaHei","SimSun";}
@@ -57,7 +56,7 @@
 		.two-hide{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; text-overflow:ellipsis;}
 		.three-hide{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; text-overflow:ellipsis;}
 
-        .tree{position:fixed; left:0; bottom:0; width:460px; height:460px; background:url(../src/index/_img/tree.png) no-repeat left bottom; background-size:460px;}
+        .tree{position:fixed; opacity:0.6; left:0; bottom:0; width:460px; height:460px; background:url(../src/index/_img/tree.png) no-repeat left bottom; background-size:460px;}
 
         #editbox{position:relative; padding-top:40px; padding-bottom:20px; width:980px; margin:0 auto; font-size:16px; caret-color:#000000!important;}
         #editbox ul,
@@ -74,12 +73,23 @@
 
         #editbox .titleinput{box-sizing:border-box; display:block; margin-bottom:18px; width:100%; height:50px; padding:8px 12px; font-size:20px; background:rgba(255,255,255,0.7); border:1px solid #c4c4c4; outline:none;}
         #editbox .labelbox{margin-top:18px;}
-        #editbox .labelbox .title{padding:10px 0; font-size:18px; color:#444444; font-weight:bold;}
+        #editbox .labelbox .title{padding:10px 0; font-size:18px; color:#444444; font-weight:bold; text-shadow: 0 0 8px #ffffff;}
         #editbox .labelbox .labels{padding-top:14px; border:1px solid #c4c4c4; border-left:none; border-right:none;}
         #editbox .labelbox .labels .label{margin:0 14px 14px 0;  color:#555555; cursor:pointer;}
         #editbox .labelbox .labels .label input{display:none;}
         #editbox .labelbox .labels .label span{display:inline-block; height:30px; line-height:30px; padding:0 14px; border-radius:16px; border:1px solid #999999; background:rgba(255,255,255,0.5);}
         #editbox .labelbox .labels .label input:checked~span{background-color:#0e7fe1; color:#ffffff; border-color:#0e7fe1;}
+
+        #editbox .coverbox{margin-top:18px;}
+        #editbox .coverbox .title{padding:10px 0; font-size:18px; color:#444444; font-weight:bold; text-shadow: 0 0 8px #ffffff;}
+        #editbox .coverbox .covers{padding:14px 0; border:1px solid #c4c4c4; border-left:none; border-right:none;}
+        #editbox .coverbox .covers .ylbox{position:relative; width:120px; height:90px; border-radius:8px; overflow:hidden; background:rgba(255,255,255,0.8); border:1px solid #c4c4c4;}
+        #editbox .coverbox .covers .ylbox .showimg{width:100%; height:100%; object-fit:cover;}
+        #editbox .coverbox .covers .ylbox .tstext{position:absolute; top:0; left:0; width:100%; height:100%; color:#777777;}
+        #editbox .coverbox .covers .ylbox .fileinput{position:absolute; top:0; left:0; z-index:9; width:100%; height:100%; opacity:0; cursor:pointer;}
+        #editbox .coverbox .covers .ylbox .textarea{box-sizing:border-box; padding:10px; position:absolute; top:0; left:0; z-index:9; width:100%; height:100%; opacity:0; resize:none; border:none; outline:none;}
+        #editbox .coverbox .covers .ylbox .textarea:focus{outline:1px solid #0088bb; background:#ffffff; opacity:1;}
+        #editbox .coverbox .covers .or{margin:14px; font-size:20px; color:#777777;}
 
         #editbox .btnbox{padding:18px 0; margin-top:10px;}
         #editbox .btnbox .btn{box-sizing:border-box; height:36px; padding:0 18px; border-radius:18px; border:1px solid #0e7fe1; color:#0e7fe1; background:#F0F8FF; outline:none; cursor:pointer; font-size:16px;}
@@ -87,7 +97,7 @@
         #editbox .btnbox .btn.submit{background:#0e7fe1; min-width:120px; color:#ffffff;}
 
         .yulan{box-sizing:border-box; position:absolute; width:980px; height:80%; padding:20px; top:0; left:0; right:0; bottom:0; margin:auto; background:#ffffff; text-align:left; overflow-y:auto; font-size:16px;}
-        .yulan .title{font-size:20px; margin-bottom:34px; text-align:center;}
+        .yulan .title{font-size:22px; margin-bottom:34px; }
     </style>
 </head>
 <body>
@@ -108,6 +118,22 @@
                 <div class="title">选择标签</div>
                 <div id="labels" class="labels df df-w-w"></div>
             </div>
+            <div class="coverbox">
+                <div class="title">选择封面<span class="tishi">(可选项)</span></div>
+                <div id="covers" class="covers df ai-c">
+                    <div class="ylbox imgurl">
+                        <img src="" alt="" class="showimg hide" />
+                        <div class="tstext df ai-c just-c-ct">粘贴图片地址</div>
+                        <textarea class="textarea" placeholder="请粘贴图片地址"></textarea>
+                    </div>
+                    <div class="or">或者</div>
+                    <div class="ylbox upfile">
+                        <img src="" alt="" class="showimg hide" />
+                        <div class="tstext df ai-c just-c-ct">上传图片</div>
+                        <input type="file" class="fileinput" />
+                    </div>
+                </div>
+            </div>
             <div class="btnbox df ai-c just-c-bet">
                 <div class="df">
                     <button class="btn" onclick="yulan()">预览</button>
@@ -124,9 +150,10 @@
 <script type="text/javascript" src="../js/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../js/main.js"></script>
 <script type="text/javascript" src="../js/ckeditor/ckeditor.js"></script>
-<!-- <script type="text/javascript" src="../js/ckeditor/translations/zh-cn.js"></script> -->
 <script type="text/javascript">
 var labels = $("#labels");
+var covers = $("#covers");
+var cover = "";
 
 $(function(){
 	setEvent();
@@ -134,7 +161,50 @@ $(function(){
     getData();
 });
 
-function setEvent(){}
+function setEvent(){
+    covers.find(".textarea").blur(function(){
+        var val = $(this).val();
+        if(!val){return}
+        cover = val;
+        var imgurl = covers.find(".imgurl");
+        var upfile = covers.find(".upfile");
+        imgurl.find(".tstext").addClass("hide");
+        imgurl.find(".showimg").removeClass("hide").attr("src",val);
+        imgurl.find(".textarea").val("");
+        upfile.find(".tstext").removeClass("hide");
+        upfile.find(".showimg").addClass("hide");
+        upfile.find(".fileinput").val("");
+    });
+    covers.find(".fileinput").change(function(){
+        var file = this.files[0];
+        var data = new FormData();
+        data.append('file', file);
+        data.append('pwd', prompt("口令:"));
+        $.ajax({
+            url: '/phps/article/articleFile.php',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (data && data.code == 0) {
+                    cover = data.default;
+                    var imgurl = covers.find(".imgurl");
+                    var upfile = covers.find(".upfile");
+                    imgurl.find(".tstext").removeClass("hide");
+                    imgurl.find(".showimg").addClass("hide");
+                    imgurl.find(".textarea").val("");
+                    upfile.find(".tstext").addClass("hide");
+                    upfile.find(".showimg").removeClass("hide").attr("src",cover);
+                    upfile.find(".fileinput").val("");
+                } else {
+                    toast(data.msg);
+                }
+            }
+        });
+    });
+}
 
 function init(){
     if(localStorage.getItem("essay_title")){$("#editbox .titleinput").val(localStorage.getItem("essay_title"));}
@@ -173,13 +243,13 @@ function init(){
             return {
                 upload(){
                     return new Promise(function(resolve, reject){
-                        var data = new FormData();
                         loader.file.then(function(res){
+                            var data = new FormData();
                             var file = res;
                             data.append('file', file);
                             data.append('pwd', prompt("口令:"));
                             $.ajax({
-							    url: '/phps/article/articleFile.php', //后端的上传接口 
+							    url: '/phps/article/articleFile.php',
 							    type: 'POST',
 							    data: data,
 							    dataType: 'json',
@@ -286,6 +356,7 @@ function submit(){
         data:{
             title: title,
             text: cont,
+            cover: cover,
             label: labels.join(","),
             key: prompt("口令：")
         },
