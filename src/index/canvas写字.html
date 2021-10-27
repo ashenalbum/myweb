@@ -1,0 +1,73 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>demo</title>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <style>
+        body{text-align:center;margin:0;}
+        canvas{background:#ffffff; border:1px solid #ccc; display:block; margin:10px auto 0;}
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="500" height="580"></canvas>
+
+<script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext('2d');
+	var ratio = 1;
+	init();
+	
+    function init(){
+	
+		var devicePixelRatio = window.devicePixelRatio || 1;
+		var backingStoreRatio = ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
+
+		ratio = devicePixelRatio / backingStoreRatio || 1;
+		console.log(ratio);
+		
+		cwid = (document.body.offsetWidth - 40) * ratio;
+		chig = (document.body.offsetHeight - 40) * ratio;
+
+		canvas.style = 'width:'+cwid/ratio+'px;height:'+chig/ratio+'px;';
+		canvas.setAttribute('width',cwid);
+		canvas.setAttribute('height',chig);
+		
+		ctx.lineWidth = 6;
+        ctx.strokeStyle = "#333333";
+        canvas.addEventListener("touchstart",mouseDown);
+    }
+	
+    function mouseDown(event){
+        var x = event.touches[0].pageX - canvas.offsetLeft;
+        var y = event.touches[0].pageY - canvas.offsetTop;
+		x = x*ratio;
+		y = y*ratio;
+		
+		ctx.beginPath();
+		ctx.moveTo(x,y);
+		canvas.addEventListener('touchmove',mousemove);
+		canvas.addEventListener('touchend',mouseup);
+    }
+	
+    function mousemove(event){
+        var x = event.touches[0].pageX - canvas.offsetLeft;
+        var y = event.touches[0].pageY - canvas.offsetTop;
+		x = x*ratio;
+		y = y*ratio;
+		ctx.lineTo(x,y);
+		ctx.stroke();
+    }
+	
+    function mouseup(){
+		canvas.removeEventListener('touchmove',mousemove);
+		canvas.removeEventListener('touchend',mouseup);
+        ctx.closePath();
+    }
+	
+	function out(){
+		console.log(canvas.toDataURL('image/jpeg',1));
+	}
+</script>
+</body>
+</html>
