@@ -12,7 +12,7 @@
 <meta content="email=no" name="format-detection">
 ```
 
-```
+```javascript
 var file = ts.files[0];
 var zhiliang = 5;
 var maxwidth = 1000;
